@@ -1,2 +1,2 @@
 # Thesis
-The thesis for my Bachelor's degree at the University of Padua
+[![Build Status](https://travis-ci.org/Polpetta/Thesis.svg?branch=master)](https://travis-ci.org/Polpetta/Thesis)
