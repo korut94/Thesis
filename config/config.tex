@@ -6,12 +6,12 @@
 % Frontespizio
 %**************************************************************
 \newcommand{\myName}{Andrea Mantovani}                          % autore
-\newcommand{\myTitle}{SentimentMemory}                    
+\newcommand{\myTitle}{SentimentMemory}
 \newcommand{\myDegree}{Tesi di laurea triennale}                % tipo di tesi
 \newcommand{\myUni}{Università degli Studi di Padova}           % università
 \newcommand{\myFaculty}{Corso di Laurea in Informatica}         % facoltà
 \newcommand{\myDepartment}{Dipartimento di Matematica}          % dipartimento
-\newcommand{\myProf}{Prof. Filè}                                % relatore
+\newcommand{\myProf}{Gilberto Filè}                             % relatore
 \newcommand{\myLocation}{Padova}                                % dove
 \newcommand{\myAA}{2015-2016}                                   % anno accademico
 \newcommand{\myTime}{Sett 2016}                                 % quando
@@ -28,12 +28,12 @@
 %**************************************************************
 % Impostazioni di biblatex
 %**************************************************************
-\bibliography{res/bibliography} % database di biblatex 
+\bibliography{res/bibliography} % database di biblatex
 
 \defbibheading{bibliography}
 {
     \cleardoublepage
-    \phantomsection 
+    \phantomsection
     \addcontentsline{toc}{chapter}{\bibname}
     \chapter*{\bibname\markboth{\bibname}{\bibname}}
 }
@@ -139,7 +139,7 @@
     breaklines=true,
     frameround=ftff,
     frame=single
-} 
+}
 
 
 %**************************************************************
@@ -181,8 +181,8 @@
 \newenvironment{risk}[1]{
     \refstepcounter{riskcounter}        % increment counter
     \par \noindent                      % start new paragraph
-    \textbf{\arabic{riskcounter}. #1}   % display the title before the 
-                                        % content of the environment is displayed 
+    \textbf{\arabic{riskcounter}. #1}   % display the title before the
+                                        % content of the environment is displayed
 }{
     \par\medskip
 }
@@ -203,13 +203,13 @@
 % #1: ID
 % #2: Nome
 \newenvironment{usecase}[2]{
-    \renewcommand{\theusecasecounter}{\usecasename #1}  % this is where the display of 
+    \renewcommand{\theusecasecounter}{\usecasename #1}  % this is where the display of
                                                         % the counter is overwritten/modified
     \refstepcounter{usecasecounter}             % increment counter
     \vspace{10pt}
     \par \noindent                              % start new paragraph
-    {\large \textbf{\usecasename #1: #2}}       % display the title before the 
-                                                % content of the environment is displayed 
+    {\large \textbf{\usecasename #1: #2}}       % display the title before the
+                                                % content of the environment is displayed
     \medskip
 }{
     \medskip
@@ -230,7 +230,7 @@
 \newenvironment{namespacedesc}{
     \vspace{10pt}
     \par \noindent                              % start new paragraph
-    \begin{description} 
+    \begin{description}
 }{
     \end{description}
     \medskip
