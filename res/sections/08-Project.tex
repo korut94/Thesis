@@ -1,0 +1,63 @@
+%% TODO: Improve "conoscenze canoniche d'informatica" no clear, l.35
+
+\chapter{Il progetto di stage}
+\label{cap:progetto-stage}
+
+\section{Errare è umano}
+Il compito per cui la Wonderflow viene commissionata è ricercare e riportare
+statistiche di gradimento dei clienti su prodotti richiesti dai vari
+committenti; siano rasoi elettrici, cellulari o altri prodotti elettronici e
+non, il compito principale della Wonderflow è di ottenere queste informazioni.
+
+Le preziosi fonti, dove l'azienda attinge, sono le recensioni dei prodotti
+degli utenti nei più grandi servizi di vendita online (es. Amazon), in cui è
+subito disponibile un loro cospicuo numero senza limiti e costi aggiunti
+rendendo davvero semplice l'operazione di raccolta dati. La recensione
+però è un'informazione grezza, non immediatamente utilizzabile per le seguenti
+ragioni:
+\begin{itemize}
+\item E' in forma di testo libero
+\item Contiene all'interno informazioni su più aspetti del prodotto
+\item Spesso la descrizione non è chiara, a volte contraddittoria
+\item Può essere scritta in più lingue
+\end{itemize}
+
+tutto ciò dovuto all'autore della recensione: l'umano. \\
+
+A fronte di questo, la Wonderflow ha progettato un processo di raffinamento per
+poter usufruire delle informazioni all'interno delle recensioni, ed è proprio
+qui che entra in gioco in modo preponderante la figura dell'\textbf{analista}.
+
+\subsection{Descrizione del processo}
+La primo trattato consiste nel \textit{download} delle recensioni da parte di
+un dipendente, solitamente uno sviluppatore. Il motivo è che la procedura
+richiede l'avvio di una serie di \gls{script} e controlli fuori dalle
+competenze di personale con conoscenze canoniche d'informatica.
+Una volta scaricate le recensioni dai vari siti web di vendita online, esse
+vengono passate all'\textit{Operations Manager} in modo che possa distribuirle
+tra i vari \textbf{analisti} in base alla disponibilità e alle abilità.
+
+Una volta che l'analista ha a disposizione le recensioni da analizzare può
+iniziare a cercare le \textbf{annotazioni}. Come detto precedentemente le
+annotazioni sono testo in cui ne si può dedurre un \textbf{sentimento} su un
+aspetto del prodotto, da cui è possibile alimentare la \textbf{Wonderboard} con
+tutta una serie di statistiche interessanti per il committente.
+Essendo che in una recensione l'autore può aver dato più commenti sulle varie
+caratteristiche dell'articolo, ci si aspetta di avere un'annotazione o più per
+ogni commento.
+
+La procedura per individuare annotazioni viene eseguita in un tool interno
+chiamato \textbf{Admin Wonderflow} dove, tra i tanti servizi offerti, vi è
+l'\textbf{editor} di selezione delle annotazioni. All'analista, una volta aperto
+l'editor, è in grado di selezionare la recensione, visualizzarne il contenuto ed
+iniziare l'analisi. Per creare l'annotazione utilizzabile dal è sufficiente
+selezionare il testo interessato in modo che l'editor esegua in automatico la
+procedura d'estrazione del contenuto. 
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=2cm]{review_process}
+\caption{Rappresentazione del processo da recensione ad annotazioni}
+\label{fig:review_process}
+\end{center}
+\end{figure}
