@@ -1,10 +1,11 @@
 %% TODO: Improve "conoscenze canoniche d'informatica" no clear, l.35
 %% TODO: Replace "sottoparte" with something else, l.67
+%% TODO: Crete reference with the "Prestazioni modulo NER" section, l. to define
 
 \chapter{Il progetto di stage}
 \label{cap:progetto-stage}
 
-\section{Errare è umano}
+\section{Dalle recensione alle annotazioni}
 Il compito per cui la Wonderflow viene commissionata è ricercare e riportare
 statistiche di gradimento dei clienti su prodotti richiesti dai vari
 committenti; siano rasoi elettrici, cellulari o altri prodotti elettronici e
@@ -31,6 +32,7 @@ all'interno delle recensioni, ed è proprio qui che entra in gioco in modo
 preponderante la figura dell'\textbf{analista}.
 
 \subsection{Descrizione del processo}
+\label{subsec:processo_recensioni_annotazioni}
 L'intera catena è divisa in 5 parti:
 \begin{enumerate}
   \item Download recensioni (\textit{Developer})
@@ -151,7 +153,9 @@ contesto di dove l'annotazione è stata presa e quindi di poter dedurre se quest
 è pertinente oppure no. &
 \nameref{evidenziarla} \tabularnewline \hline
 \textit{syn} &
-Traduzione in lingua originale dell'annotazione. &
+Traduzione in lingua originale dell'annotazione. Nei sviluppi futuri potrà
+essere usato per garantire l'identificazione di una medesima annotazione in
+diverse lingue. &
 \nameref{riassumerla} \tabularnewline \hline
 \textit{sentiment} &
 Il sentimento espresso dall'annotazione. Il sentimento positivo viene
@@ -172,13 +176,107 @@ automaticamente con il valore ``v2'' dall'editor. &
 Settore della recensione dov'è stata individuata l'annotazione all'interno della
 recensione. I possibili valori sono:
 \begin{itemize}
-\item free-text
-\item pros
-\item cons
+\item ``free-text''
+\item ``pros''
+\item ``cons''
 \end{itemize}
 nel caso l'annotazione fosse stata presa rispettivamente nel testo libero, nei
 pregi oppure nei difetti &
 \nameref{evidenziarla} \tabularnewline \hline
 \caption{Descrizione attributi di un'annotazione in JSON con la relativa fase}
+\label{tab:attributi_annotazione}
 \end{longtable}
 \end{center}
+
+Una volta che l'annotazione è stata revisionata dal \textit{Senior Analyst},
+risultando positiva ai test sulla qualità, può essere archiviata ed elaborata
+dal sistema per poter fornire dati alla \textbf{Wonderboard}.
+
+\subsection{Errori nel processo d'analisi}
+Il processo d'analisi delle recensioni è di primaria importanza in quanto
+fornisce i dati necessari per offrire i servizi proposti dall'azienda.
+Tuttavia per poterlo eseguire, si è costretti a richiedere continuamente
+l'intervento di operatori umani data la natura non automatizzabile delle
+operazioni che si vanno a compiere.
+
+Ne consegue che il sistema perde la scalabilità, aumenta i costi di mantenimento
+ma soprattutto è necessaria un'attenta e costante supervisione del lavoro svolto
+dagli analisti che può facilmente essere soggetto ad errori.
+
+Durante il periodo dello stage è stato possibile comprendere i principali
+fattori che conducono l'analista a commettere sbagli durante l'analisi delle
+recensioni (i risultati sono riportati nella tabella
+\ref{tab:fattori_errore}).
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\hline
+\textbf{Fattore} & \textbf{Conseguenza} \\ \hline
+Inesperienza &
+L'analista non comprende a pieno la recensione creando annotazioni di poca
+utilità. È inoltre possibile che non comprenda a pieno quali siano le
+caratteristiche per produrre una buona annotazione, sfociando in risultati
+scadenti. \\ \hline
+Carico di lavoro &
+L'analista, dove un certo numero di ore di lavoro, tende a perdere la
+concentrazione aumentando la possibilità di commettere errori. \\ \hline
+Tempistiche &
+A volte l'analisi delle recensioni devono essere svolte in tempi più stretti.
+Questo porta l'analista a svolgere un lavoro frettoloso.
+\\ \hline
+\end{tabular}
+\end{center}
+\caption{Fattori d'errore durante l'analisi delle recensioni}
+\label{tab:fattori_errore}
+\end{table}
+
+\section{Le componenti sviluppate}
+Ora che è stato introdotto il quadro generale per l'estrapolazione delle
+annotazioni dentro le recensioni, è possibile parlare dell'obiettivo dello stage
+tenuto presso la Wonderflow. Come è stato detto un grosso problema è l'analisi
+delle recensioni tenuta dall'analista, la quale sovente commette una serie
+d'errori che deficitano la produttività dell'azienda.
+
+In questa sezione verranno esposi le varie componenti sviluppate nel corso dello
+stage al fine di ridurre gli errori, garantendo un miglioramento dell'efficacia
+nel processo di analisi delle recensioni.
+
+\subsection{Il modulo NER}
+Il progetto di stage mira al miglioramento del lavoro dell'analista introducendo
+un supporto nell'individuazione delle possibile annotazioni. Più precisamente
+si tratta di un modulo \gls{NER} grafico il quale individua nelle recensioni
+annotazioni basandosi su quelle precedentemente archiviate.
+
+Il suo uso è molto semplice: all'analista, entrando nell'editor, gli vengono
+immediatamente suggerite delle possibili annotazioni nello stesso formato di
+quelle individuate. Questo significa che l'analista si troverà nelle recensioni
+le annotazioni già evidenziate e i campi dati richiesti già inseriti.
+
+Ora sta all'analista decidere di scegliere se accettarle o meno, in quanto è
+possibile che all'interno di quella recensione l'annotazione suggerita non sia
+corretta. Nel caso l'accettasse, l'annotazione si inserirebbe nella lista di
+quelle da validare; in caso non l'accettasse verrebbe semplicemente rimossa
+dall'editor. \\
+
+Per capire meglio la sua utilità è comodo paragonarlo ad uno strumento presente
+da molto tempo nei sistemi di messaggistica per cellulari, quando l'utente è
+intento a comporre le parole: il correttore. Mentre scrive la parola,
+all'utente gli vengono visualizzate delle possibili scelte che può usare.
+Selezionando la scelta desiderata si vedrà la porzione di parola scritta essere
+sostituita con la parola suggerita. Questo ancora oggi è uno strumento di
+notevole aiuto che aiuta a velocizzare la scrittura dei messaggi e ad evitare di
+commettere errori di battitura.
+
+Analogamente per le annotazioni, ora l'analista non deve più seguire tutti i
+passaggi che portano alla creazione delle annotazioni (descritto nella
+sottosezione \ref{subsec:processo_recensioni_annotazioni}), ma è sufficiente
+confermare il suggerimento dato dal sistema \gls{NER}. Oltre a risparmiare
+tempo, esattamente come il correttore automatico, si evitano tutti possibili
+errori che si possono incorrere in questa fase per i fattori esposti nella
+tabella \ref{tab:fattori_errore}. Inoltre, in fase di controllo della qualità le
+annotazioni create attraverso il sistema di riconoscimento vengono approvate
+automaticamente essendo prese d'annotazioni precedentemente controllate;
+riducendo anche il tempo del \textit{Senior Analyst} per il controllo qualità.
+
+\subsection{Moderazione del glossario}
