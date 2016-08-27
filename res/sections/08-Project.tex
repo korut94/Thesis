@@ -1,4 +1,5 @@
 %% TODO: Improve "conoscenze canoniche d'informatica" no clear, l.35
+%% TODO: Replace "sottoparte" with something else, l.67
 
 \chapter{Il progetto di stage}
 \label{cap:progetto-stage}
@@ -24,11 +25,29 @@ ragioni:
 
 tutto ciò dovuto all'autore della recensione: l'umano. \\
 
-A fronte di questo, la Wonderflow ha progettato un processo di raffinamento per
-poter usufruire delle informazioni all'interno delle recensioni, ed è proprio
-qui che entra in gioco in modo preponderante la figura dell'\textbf{analista}.
+A fronte di questo, la Wonderflow ha progettato un processo di raffinamento
+(fig. \ref{fig:review_process}) per poter usufruire delle informazioni
+all'interno delle recensioni, ed è proprio qui che entra in gioco in modo
+preponderante la figura dell'\textbf{analista}.
 
 \subsection{Descrizione del processo}
+L'intera catena è divisa in 5 parti:
+\begin{enumerate}
+  \item Download recensioni (\textit{Developer})
+  \item Distribuzione recensione agli analisti (\textit{Operations Manager})
+  \item Analisi (\textit{Analysts})
+  \item Controllo qualità (\textit{Senior Analyst})
+  \item Archiviazione annotazioni approvate (\textit{Developer})
+\end{enumerate}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=2cm]{review_process}
+\caption{Rappresentazione del processo da recensione ad annotazioni}
+\label{fig:review_process}
+\end{center}
+\end{figure}
+
 La primo trattato consiste nel \textit{download} delle recensioni da parte di
 un dipendente, solitamente uno sviluppatore. Il motivo è che la procedura
 richiede l'avvio di una serie di \gls{script} e controlli fuori dalle
@@ -39,25 +58,127 @@ tra i vari \textbf{analisti} in base alla disponibilità e alle abilità.
 
 Una volta che l'analista ha a disposizione le recensioni da analizzare può
 iniziare a cercare le \textbf{annotazioni}. Come detto precedentemente le
-annotazioni sono testo in cui ne si può dedurre un \textbf{sentimento} su un
-aspetto del prodotto, da cui è possibile alimentare la \textbf{Wonderboard} con
-tutta una serie di statistiche interessanti per il committente.
+annotazioni sono testo in cui si può dedurre un \textbf{sentimento} su un
+aspetto del prodotto.
+
 Essendo che in una recensione l'autore può aver dato più commenti sulle varie
-caratteristiche dell'articolo, ci si aspetta di avere un'annotazione o più per
-ogni commento.
+caratteristiche dell'articolo ci si aspetta di avere un'annotazione, o più, per
+ogni commento. E' da precisare che il testo dell'annotazione non coincide quasi
+mai con il testo del commento ma è ben si una sua sottoparte che possa
+rappresentarlo al meglio.
 
 La procedura per individuare annotazioni viene eseguita in un tool interno
 chiamato \textbf{Admin Wonderflow} dove, tra i tanti servizi offerti, vi è
-l'\textbf{editor} di selezione delle annotazioni. All'analista, una volta aperto
+l'\textbf{editor} di selezione delle annotazioni. L'analista, una volta aperto
 l'editor, è in grado di selezionare la recensione, visualizzarne il contenuto ed
-iniziare l'analisi. Per creare l'annotazione utilizzabile dal è sufficiente
-selezionare il testo interessato in modo che l'editor esegua in automatico la
-procedura d'estrazione del contenuto. 
+iniziare l'analisi. Per creare un'annotazione inseribile nel sistema
+informatico aziendale, l'analista deve necessariamente seguire la seguente
+serie di passaggi:
 
-\begin{figure}[ht]
+\paragraph{Evidenziarla}
+\label{evidenziarla}
+L'analista, con il cursore del mouse, evidenzia la frazione di testo della
+recensione dove ha individuato il commento.
+
+\paragraph{Riassumerla}
+\label{riassumerla}
+L'analista deve riassumere il testo sottolineato individuando un periodo che
+meglio rappresenti il commento. Nel caso l'annotazione fosse espressa in una
+lingua diversa dall'inglese è necessario che l'analista fornisca sia la
+traduzione che il testo originale.
+
+\paragraph{Assegnargli un sentimento}
+\label{sentimento}
+E' compito dell'analista decidere se quell'annotazione ha un significato
+\textbf{positivo} oppure \textbf{negativo}.
+
+\paragraph{Catalogarla}
+\label{catalogarla}
+Le categorie nascono per raggruppare tutte quelle annotazioni che si
+riferiscono ad una stessa caratteristica di un prodotto. L'analista deve
+associare per ogni annotazione una delle categorie offerte dall'editor.
+
+\paragraph{Intitolarla}
+\label{intitolarla}
+È richiesto che l'analista dia un titolo all'annotazione.
+
+\paragraph{Salvarla}
+\label{salvarla}
+L'analista dichiara di aver terminato l'analisi di una recensione e sottomette
+le annotazioni prodotte al controllo qualità. \\
+
+Durante questa procedura verrà generata una struttura dati in formato \gls{JSON}
+con il seguente schema (NdR: per motivi di leggibilità riporto solo il nome ed
+il tipo di ogni attributo):
+
 \begin{center}
-\includegraphics[height=2cm]{review_process}
-\caption{Rappresentazione del processo da recensione ad annotazioni}
-\label{fig:review_process}
+\begin{lstlisting}[frame=single]
+{
+  "category": "string",
+  "name": "string",
+  "text" : "string",
+  "syn" : "string",
+  "sentiment" : "number",
+  "start" : "number",
+  "offset" : "number",
+  "uid" : "string",
+  "version" : "string",
+  "origin" : "string",
+  "id" : "string"
+}
+\end{lstlisting}
 \end{center}
-\end{figure}
+
+La tabella sottostante descrive il significato di ogni campo, il suo utilizzo e
+in quale fase viene prodotto.
+
+\begin{center}
+\begin{longtable}{|>{\centering}p{2.2cm}|p{8cm}|>{\centering}p{2.5cm}|}
+\hline
+\textbf{Attributo} & \textbf{Descrizione} & \textbf{Fase} \tabularnewline \hline
+\textit{category} &
+Categoria di appartenenza di un'annotazione. Permette di capire su quale
+aspetto di un prodotto l'annotazione offre un giudizio. &
+\nameref{catalogarla} \tabularnewline \hline
+\textit{name} &
+Testo dell'annotazione e traduzione in inglese nel caso il testo originale
+fosse espresso in un'altra lingua. Rappresenta l'annotazione vera e propria. &
+\nameref{riassumerla} \tabularnewline \hline
+\textit{text} &
+Testo del commento evidenziato dall'analista. Il salvataggio del commento
+risolve l'esigenza, soprattutto in fase di controllo sulla qualità, di avere il
+contesto di dove l'annotazione è stata presa e quindi di poter dedurre se questa
+è pertinente oppure no. &
+\nameref{evidenziarla} \tabularnewline \hline
+\textit{syn} &
+Traduzione in lingua originale dell'annotazione. &
+\nameref{riassumerla} \tabularnewline \hline
+\textit{sentiment} &
+Il sentimento espresso dall'annotazione. Il sentimento positivo viene
+rappresentato con l'intero 1, mentre il sentimento negativo con l'intero 0. &
+\nameref{sentimento} \tabularnewline \hline
+\textit{start} ed \textit{offset} &
+Posizione di partenza del testo dell'annotazione e la sua lunghezza. &
+\nameref{evidenziarla} \tabularnewline \hline
+\textit{uid} &
+Titolo dell'annotazione. &
+\nameref{intitolarla} \tabularnewline \hline
+\textit{version} &
+Versione dell'annotazione. Disambigua le annotazioni prodotto dopo una
+aggiornamento consistente sulla gestione delle annotazioni. Viene inizializzato
+automaticamente con il valore ``v2'' dall'editor. &
+\nameref{salvarla} \tabularnewline\hline
+\textit{origin} &
+Settore della recensione dov'è stata individuata l'annotazione all'interno della
+recensione. I possibili valori sono:
+\begin{itemize}
+\item free-text
+\item pros
+\item cons
+\end{itemize}
+nel caso l'annotazione fosse stata presa rispettivamente nel testo libero, nei
+pregi oppure nei difetti &
+\nameref{evidenziarla} \tabularnewline \hline
+\caption{Descrizione attributi di un'annotazione in JSON con la relativa fase}
+\end{longtable}
+\end{center}
