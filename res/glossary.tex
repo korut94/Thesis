@@ -7,6 +7,31 @@ polifunzionale.
 }
 }
 
+\newglossaryentry{application-programming-interface} {
+name=Application Programming Interface,
+description={
+Insieme di procedure disponibili al programmatore, di solito raggruppate a
+formare un set di strumenti specifici per l’espletamento di un determinato
+compito all’interno di un certo programma.
+}
+}
+
+\newglossaryentry{backend-as-a-service} {
+name=Backend as a Service,
+description={
+Modello per fornire agli sviluppatori di applicazioni web di collegare le loro
+applicazioni ad un \glslink{back-end} tramite API.
+}
+}
+
+\newglossaryentry{back-end} {
+name=back end,
+description={
+Termine inglese che indica la parte di un sistema software che si occupa della
+memorizzazione e del recupero dei dati.
+}
+}
+
 \newglossaryentry{business-to-business} {
 name=Business-to-business,
 description={
@@ -19,6 +44,24 @@ name=dashboard,
 description={
 Interfaccia utente dove vengono esposte le informazioni più rilevanti e di
 frequente consultazione in base all'argomento.
+}
+}
+
+\newglossaryentry{front-end} {
+name=front end,
+description={
+Parte visibile all’utente e con cui egli può interagire; nella sua accezione più
+generale, è responsabile dell’acquisizione dei dati di ingresso e della loro
+elaborazione con modalità conformi a specifiche predefinite e invarianti, tali
+da renderli utilizzabili dal back end.
+}
+}
+
+\newglossaryentry{interoperabilita} {
+name=interoperabilità,
+description={
+Capacità di due o più sistemi, reti, mezzi, applicazioni o componenti, di
+scambiare informazioni tra loro e di essere poi in grado di utilizzarle.
 }
 }
 
@@ -49,6 +92,19 @@ esistente.
 }
 }
 
+\newglossaryentry{representational_state_transfer} {
+name=representational state transfer,
+description={
+Insieme di principi di architetture di rete, i quali delineano come le risorse
+sono definite e indirizzate. In particolare prevede che lo stato
+dell’applicazione e le funzionalità siano divisi in risorse web, che ogni
+risorsa sia unica e indirizzabile usando sintassi universale per uso nei link
+ipertestuali e che tutte le risorse siano condivise come interfaccia uniforme
+per il trasferimento di stato tra client e risorse (attraverso un insieme
+vincolato di operazioni ben definite e un protocollo stateless).
+}
+}
+
 \newglossaryentry{script} {
 name=script,
 description={
@@ -67,11 +123,27 @@ controllo sulla qualità e le tempistiche del progetto.
 }
 }
 
+\newglossaryentry{separation_of_concerns} {
+name=Separation of concerns,
+description={
+Un principio di progettazione software per separare un programma in varie
+sezioni.
+}
+}
+
 \newglossaryentry{sprint} {
 name=sprint,
 description={
 Unità base della fase operativa nel modello di sviluppo \glslink{scrum} e
 corrisponde ad una iterazione.
+}
+}
+
+\newglossaryentry{web-service} {
+name=Web Service,
+description={
+Un sistema software progettato per supportare l'interoperabilità tra elaboratori
+su una rete.
 }
 }
 
@@ -87,3 +159,6 @@ Attività volta alla ricerca di consistenza, correttezza e completezza.
 \newacronym[see={[Glossary:]{business-to-business}}]{B2B}{B2B}{Business-to-business}
 \newacronym[see={[Glossary:]{named_entity_recognition}}]{NER}{NER}{Named Entity Recognition}
 \newacronym[see={[Glossary:]{javascript_object_notation}}]{JSON}{JSON}{JavaScript Object Notation}
+\newacronym[see={[Glossary:]{representational_state_transfer}}]{REST}{REST}{representational state transfer}
+\newacronym[see={[Glossary:]{backend-as-a-service}}]{BaaS}{BaaS}{Backend as a Service}
+\newacronym[see={[Glossary:]{application-programming-interface}}]{API}{API}{Application Programming Interface}
