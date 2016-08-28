@@ -1,6 +1,6 @@
 %% TODO: Improve "conoscenze canoniche d'informatica" no clear, l.35
 %% TODO: Replace "sottoparte" with something else, l.67
-%% TODO: Crete reference with the "Prestazioni modulo NER" section, l. to define
+%% TODO: Crete reference for each argument with the its section
 
 \chapter{Il progetto di stage}
 \label{cap:progetto-stage}
@@ -110,8 +110,9 @@ L'analista dichiara di aver terminato l'analisi di una recensione e sottomette
 le annotazioni prodotte al controllo qualità. \\
 
 Durante questa procedura verrà generata una struttura dati in formato \gls{JSON}
-con il seguente schema (NdR: per motivi di leggibilità riporto solo il nome ed
-il tipo di ogni attributo):
+al cui interno vi è un attributo contenente la lista delle annotazioni. Ogni
+annotazione viene salvata con il seguente schema (NdR: per motivi di leggibilità
+riporto solo il nome ed il tipo di ogni attributo):
 
 \begin{center}
 \begin{lstlisting}[frame=single]
@@ -190,7 +191,11 @@ pregi oppure nei difetti &
 
 Una volta che l'annotazione è stata revisionata dal \textit{Senior Analyst},
 risultando positiva ai test sulla qualità, può essere archiviata ed elaborata
-dal sistema per poter fornire dati alla \textbf{Wonderboard}.
+dal sistema per poter fornire dati alla \textbf{Wonderboard}. È doveroso
+aggiungere una nota: l'oggetto salvato nell'archivio è la rappresentazione
+della recensione al cui interno sono presenti le annotazioni; di tutta la serie
+di campi che compongono l'oggetto solo una piccola parte verrà trattata durante
+la relazione.
 
 \subsection{Errori nel processo d'analisi}
 Il processo d'analisi delle recensioni è di primaria importanza in quanto
@@ -205,8 +210,7 @@ dagli analisti che può facilmente essere soggetto ad errori.
 
 Durante il periodo dello stage è stato possibile comprendere i principali
 fattori che conducono l'analista a commettere sbagli durante l'analisi delle
-recensioni (i risultati sono riportati nella tabella
-\ref{tab:fattori_errore}).
+recensioni (i risultati sono riportati nella tabella \ref{tab:fattori_errore}).
 
 \begin{table}[ht]
 \begin{center}
@@ -239,7 +243,7 @@ delle recensioni tenuta dall'analista, la quale sovente commette una serie
 d'errori che deficitano la produttività dell'azienda.
 
 In questa sezione verranno esposi le varie componenti sviluppate nel corso dello
-stage al fine di ridurre gli errori, garantendo un miglioramento dell'efficacia
+stage al fine di ridurre gli errori e garantendo un miglioramento dell'efficacia
 nel processo di analisi delle recensioni.
 
 \subsection{Il modulo NER}
@@ -257,7 +261,7 @@ Ora sta all'analista decidere di scegliere se accettarle o meno, in quanto è
 possibile che all'interno di quella recensione l'annotazione suggerita non sia
 corretta. Nel caso l'accettasse, l'annotazione si inserirebbe nella lista di
 quelle da validare; in caso non l'accettasse verrebbe semplicemente rimossa
-dall'editor. \\
+dall'editor.
 
 Per capire meglio la sua utilità è comodo paragonarlo ad uno strumento presente
 da molto tempo nei sistemi di messaggistica per cellulari, quando l'utente è
@@ -265,8 +269,8 @@ intento a comporre le parole: il correttore. Mentre scrive la parola,
 all'utente gli vengono visualizzate delle possibili scelte che può usare.
 Selezionando la scelta desiderata si vedrà la porzione di parola scritta essere
 sostituita con la parola suggerita. Questo ancora oggi è uno strumento di
-notevole aiuto che aiuta a velocizzare la scrittura dei messaggi e ad evitare di
-commettere errori di battitura.
+notevole aiuto che aiuta a velocizzare la scrittura dei messaggi e, in modo
+intrinseco, ad evitare di commettere errori di battitura.
 
 Analogamente per le annotazioni, ora l'analista non deve più seguire tutti i
 passaggi che portano alla creazione delle annotazioni (descritto nella
@@ -279,4 +283,101 @@ annotazioni create attraverso il sistema di riconoscimento vengono approvate
 automaticamente essendo prese d'annotazioni precedentemente controllate;
 riducendo anche il tempo del \textit{Senior Analyst} per il controllo qualità.
 
+Nella sezione xx verrà discussa tutta la parte di sviluppo e funzionamento.
+
 \subsection{Moderazione del glossario}
+Con il termine \textit{glossario} definisco il sottoinsieme dell'archivio
+delle annotazioni individuabile all'interno delle recensioni. La motivazione del
+perché sola una determinata parte dell'archivio è rintracciabile, e non tutto
+l'insieme a disposizione, è la possibilità di raggiungere un certo livello di
+qualità nel riconoscimento. Il livello di qualità viene misurato attraverso due
+indici: la \textit{precision} e la \textit{recall}.
+
+Le due misure vanno ad indicare rispettivamente quante annotazioni, di quelle
+suggerite, sono corrette rispetto al contesto della recensione; quante
+annotazioni sono state suggerite all'interno della recensione, sul totale
+possibile. Entrambe sono unità adimensionali con valore compreso tra 0 ed 1.
+
+Il glossario deve essere scelto attentamente in modo da ottenere buoni livelli
+di \textit{recall} e \textit{precision}. È chiaro che l'uso di dizionari ampi
+favorirebbe il valore di \textit{recall}, avendo a disposizione una vasta scelta
+d'annotazioni, ma potrebbe portare ad un'abbassamento del valore di
+\textit{precision} in quanto presenti annotazioni ambigue.
+
+È bene ricordarsi che le annotazioni derivano da frasi scritte dagli utenti
+perciò selezionare annotazioni con testi semplici, corti e generici aumentano
+la possibilità di individuazione. Difficilmente annotazioni con testi lunghi,
+complessi, specifici su un argomento verrebbero riproposti in future recensioni.
+
+Anche l'inserimento di nuove annotazioni nel glossario deve essere monitorato
+per non introdurre elementi che non migliorino, o addirittura peggiorino, la
+qualità del riconoscimento.
+
+Tutte queste esigenze sono state tradotte nello sviluppo di un semplice sistema
+di moderazione che comprende: un'interfaccia grafica per selezionare le
+annotazioni che verranno inserite nel glossario e di uno \gls{script} di
+misurazione degli indici di \textit{precision} e \textit{recall}.
+
+Per la consultazione completa delle due parti si guardi: sezione xx e sezione
+xx.
+
+\section{Altri compiti}
+La realizzazione del sistema di riconoscimento automatico era il principale
+obiettivo della Wonderflow. Tuttavia, il programma di stage comprendeva anche lo
+svolgimento di una serie d'incarichi atti a migliorare lo sviluppo del software.
+
+\subsection{Script per esportare annotazioni}
+Molto usato per produrre ambienti di test è stato lo \gls{script} di
+esportazione delle annotazioni.
+
+Lo \gls{script} ha il compito di esportare le annotazioni salvate all'interno
+delle recensioni nella fase di creazione dell'annotazione, separarle, adattarle
+e salvarle in un archivio a parte.
+
+In questo modo è sempre possibile attingere all'archivio principale senza
+bisogno di richiede la costruzione di altri piccoli archivi. Inoltre, la scelta
+delle recensioni da usare come fonte può avvenire tramite query rendendo molto
+semplice creare vari archivi di annotazioni con le proprie caratteristiche. Ciò
+risulta utile in fase di test dove si posso scegliere diversi input con cui
+effettuare la prova.
+
+Il trattazione completa è trattate nella sezione xx.
+
+\subsection{Generatore di componenti web}
+La strumentazione software della Wonderflow è sviluppata principalmente come
+applicazione web. Usando il framework AngularJS, il quale spinge a seguire lo
+sviluppo per componenti, l'azienda produce una moltitudine di moduli dove
+vengono esportati singolo componenti e successivamente messe insieme nei vari
+progetti. I vantaggi di questo approccio sono il rispetto del
+\gls{separation_of_concerns}, basso accoppiamento tra le componenti,
+formazione di piccole parti semplici da mantenere e facili da testare.
+
+Tuttavia ogni volta che si crea un nuovo modulo è necessario ripetere le
+procedure d'inizializzazione, in modo da allinearlo con le regole aziendali,
+implicando un relativo consumo di tempo.
+
+Per evitare ciò si è deciso di realizzare un programma che generi l'ambiente di
+lavoro dove avviare lo sviluppo del componente, azzerando i tempi di
+configurazione.
+
+\subsection{Refactoring del BaaS}
+I concetti di \gls{front-end}, \gls{back-end} e \gls{web-service} sono molto
+importanti che stanno dando vita ad nuovo filone di sviluppo del software.
+La Wonderflow gli ha integrati all'interno del panorama aziendale, sviluppando
+quello che in gergo tecnico si definisce un \gls{BaaS}. Attraverso
+di esso lo sviluppo di applicazione web si limita alla creazione del mero
+\gls{front-end} e l'uso delle \gls{API} fornite dal \gls{BaaS} per effettuare
+le operazioni sui dati richieste.
+
+Malgrado le cure e le attenzioni poste, stretti vincoli sul tempo hanno portato
+all'uso di metodologie errate durante lo sviluppo del \gls{BaaS} che ora si
+manifestano con un'alto accoppiamento delle sue componenti e l'impossibilità
+di riutilizzare parte del suo codice in altre applicazioni.
+
+Per risolvere la situazione è stato pianificato un \gls{refactoring} che mira
+a deframmentarlo in parti indipendenti che cooperano tra loro attraverso
+sani principi d'inclusione.
+
+\section{Tecnologie utilizzate}
+Data il progetto ad ampio raggio sono state usate una buon numero di tecnologie
+che hanno alzato di molto il valore di questa esperienza.
