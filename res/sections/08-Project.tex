@@ -2,6 +2,8 @@
 %% TODO: Replace "sottoparte" with something else, l.67
 %% TODO: Crete reference for each argument with the its section
 %% TODO: In the bibliography add links to the legal term pages
+%% TODO: Search a definition for ``open standard``
+%% TODO: Create glossary entry 'test d'unità' and replate \textit with \gls
 
 \chapter{Il progetto di stage}
 \label{cap:progetto-stage}
@@ -384,9 +386,30 @@ Data il progetto ad ampio raggio sono state usate una buon numero di tecnologie
 che hanno alzato di molto il valore dell'esperienza.
 
 \subsection{AngularJS}
-Bla bla bla
+La ribalta di JavaScript negli ultimi anni ha permesso la formazione di
+nuovi modi per creare applicazioni web. Non più con l'incubo del blocco
+dell'esecuzione del codice sui browser, è stata marcata una linea molto più
+netta tra client e server: tutta la logica di rappresentazione della pagina web
+viene spostata direttamente sul primo, mentre nel secondo persistono tutti
+gli algoritmi che concernano i dati. Questo ha fatto si che le
+\gls{dynamic-web-page} fossero sostituite dalle più moderne
+\gls{single-page-application}, molto più simile alle applicazioni desktop,
+portando non solo a pagine molto più reattive ma a tracciare un sentiero guida
+per gli sviluppatori che gli conducessero all'adozione di sani principi di
+progettazione software.
 
-\begin{figure}[h]
+Uno dei framework di maggior successo nel campo delle
+\gls{single-page-application} è sicuramente \textit{AngularJS}. Diventato un
+punto di riferimento per la formazione di siti web, \textit{AngularJS} porta
+con se tutta una serie di supporti e metodologie atti a produrre un codice molto
+leggibile, semplice e ben diviso in varie componenti. Proprio attraverso le
+\textbf{componenti}, \textit{AngularJS} insegna che dividere varie parti della
+pagina in oggetti autonomi e riusabili ripaga nel tempo. Di fatto, la struttura
+di un progetto \textit{AngularJS} va quasi a premiare gli sforzi dello
+sviluppatore che seguendo i consigli impartiti può beneficiare di tutta una
+serie di agevolazioni che il framework propone.
+
+\begin{figure}[H]
 \begin{center}
 \includegraphics[height=1.6cm]{angularjs}
 \caption{Logo AngularJS}
@@ -395,9 +418,14 @@ Bla bla bla
 \end{figure}
 
 \subsection{Docker}
-Bla bla bla
-
-
+\textit{Docker} è un programma che permette la creazione di \textbf{container}
+dove eseguire pezzi di software. I container sono un'astrazione del sistema
+operativo dove viene caricato il software e tutte le dipendenze necessarie per
+eseguirlo. La particolarità che ha reso famoso \textit{Docker} rispetto alle
+tradizionali \glspl{macchina-virtuale} è la gestione più intelligente
+dell'infrastruttura alla base del sistema operativo, garantendo ai vari
+container di essere isolati, aumentando cosi la sicurezza, e di condividere le
+librerie di uso comune, diminuendo cosi l'uso di \acrshort{RAM}.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[height=4cm]{docker}
@@ -407,7 +435,15 @@ Bla bla bla
 \end{figure}
 
 \subsection{Git}
-Bla bla bla
+In un qualsiasi progetto software bisogna sempre tenere in considerazione la non
+linearità dello sviluppo: codice già scritto può venir modificato; il team di
+sviluppo può decidere di separarsi per realizzare parti distinte; soluzioni
+diverse ad un problema possono venir realizzate e comparate per decidere quale
+sia la più idonea a risolverlo. In tutti i casi è necessario poter tener traccia
+dello sviluppo del progetto in modo da aver un maggior controllo su di esso.
+
+Questo è quello che fa \textit{Git}; un \gls{CVS} progettato per piccoli o
+grandi progetti, veloce e semplice da usare.
 
 \begin{figure}[H]
 \begin{center}
@@ -417,8 +453,12 @@ Bla bla bla
 \end{center}
 \end{figure}
 
-\subsection{LingPipe}
-Bla bla bla
+\subsection{LingPipe in Java}
+\textit{LingPipe} è un \textit{tool kit} per esaminare testi usando la
+\gls{linguistica-computazionale}. L'architettura su cui si basa garantisce
+efficienza, scalabilità, riusabilità e robustezza promuovendolo come valido
+prodotto per l'analisi testuale. \textit{LingPipe} è utilizzabile solamente
+attraverso il linguaggio \textit{Java}.
 
 \begin{figure}[H]
 \begin{center}
@@ -439,7 +479,7 @@ Il maggior punto di forza di MongoDB è l'uso di una derivazione dello schema
 \gls{JSON} per salvare i dati, la quale rende davvero semplice create modelli di
 oggetti per l'applicazioni JavaScript e interagirvi tramite un \gls{DAO}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[height=1.5cm]{mongodb}
 \caption{Logo MongoDB}
@@ -460,7 +500,7 @@ Grazie alla libertà concessa dal linguaggio JavaScript e le alte prestazioni
 raggiunte da \textit{Node.js}, un numero sempre maggiore di applicazioni desktop
 vengono realizzate, senza che esse abbiano alcun legame con il mondo del web.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[height=2.3cm]{nodejs}
 \caption{Logo Node.js}
@@ -495,15 +535,29 @@ la possibilità di create ``organizzazioni'' dove poter pubblicare i pacchetti
 \textit{Node.js} in modo che solo gli utenti facentene parte possano
 visualizzarli.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
-\includegraphics[height=1.5cm]{npm}
+\includegraphics[height=1.2cm]{npm}
 \caption{Logo npm}
 \label{fig:npm_logo}
 \end{center}
 \end{figure}
 
 \subsection{Protractor}
+\textit{Protractor} è un \textit{\gls{E2ET} framework} per applicazioni
+\textit{AngularJS}. I \textit{test d'unità} sono una prima difesa contro i
+possibili errori presenti nel codice. Tuttavia la maggior parte dei
+\textit{fault} avvengo quando più componenti interagiscono fra loro.
+In quel caso è necessario usare un secondo livello di test: gli \gls{E2ET}.
+\textit{Protractor} compie il suo obiettivo fornendo sia un'ambiente di test
+controllato, ad ogni esecuzione dei test viene eseguita l'istanza di un browser
+per simulare l'interazione dell'utente sulla pagina web; che di un ampio insieme
+di \gls{API} per fornire:
+\begin{itemize}
+\item controllo sull'utente virtuale
+\item analisi sullo stato della pagina web
+\end{itemize}
+garantendo copertura totale su ogni aspetto dell'applicazione.
 
 \begin{figure}[H]
 \begin{center}
