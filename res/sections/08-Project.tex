@@ -120,19 +120,20 @@ riporto solo il nome ed il tipo di ogni attributo):
 \begin{center}
 \begin{lstlisting}[frame=single]
 {
-  "category": "string",
-  "name": "string",
-  "text" : "string",
-  "syn" : "string",
-  "sentiment" : "number",
-  "start" : "number",
-  "offset" : "number",
-  "uid" : "string",
-  "version" : "string",
-  "origin" : "string",
-  "id" : "string"
+  "category": "String",
+  "name": "String",
+  "text" : "String",
+  "syn" : "String",
+  "sentiment" : 0 | 1,
+  "start" : "Number",
+  "offset" : "Number",
+  "uid" : "String",
+  "version" : "String",
+  "origin" : "pros" | "cons" | "free-text",
+  "id" : "String"
 }
 \end{lstlisting}
+\label{snippet_annotation_review}
 \end{center}
 
 La tabella sottostante descrive il significato di ogni campo, il suo utilizzo e
@@ -174,7 +175,8 @@ Titolo dell'annotazione. &
 \textit{version} &
 Versione dell'annotazione. Disambigua le annotazioni prodotto dopo una
 aggiornamento consistente sulla gestione delle annotazioni. Viene inizializzato
-automaticamente con il valore ``v2'' dall'editor. &
+automaticamente con il valore ``v2'' dall'editor. Le versioni non ``v2''
+potrebbero avere una struttura diversa da questa. &
 \nameref{salvarla} \tabularnewline\hline
 \textit{origin} &
 Settore della recensione dov'è stata individuata l'annotazione all'interno della
