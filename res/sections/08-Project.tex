@@ -118,7 +118,11 @@ annotazione viene salvata con il seguente schema (NdR: per motivi di leggibilit√
 riporto solo il nome ed il tipo di ogni attributo):
 
 \begin{center}
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[
+  frame=single,
+  caption=Schema annotazione dell'editor,
+  label=snippet_annotation_review
+]
 {
   "category": "String",
   "name": "String",
@@ -129,11 +133,9 @@ riporto solo il nome ed il tipo di ogni attributo):
   "offset" : "Number",
   "uid" : "String",
   "version" : "String",
-  "origin" : "pros" | "cons" | "free-text",
-  "id" : "String"
+  "origin" : "pros" | "cons" | "free-text"
 }
 \end{lstlisting}
-\label{snippet_annotation_review}
 \end{center}
 
 La tabella sottostante descrive il significato di ogni campo, il suo utilizzo e
