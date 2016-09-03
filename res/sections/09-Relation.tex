@@ -1,3 +1,9 @@
+% TODO: Check the right use of the 'collection' and 'document' terms.
+% TODO: Get a better understanding about the entity's score in the LingPipe.
+% TODO: Create a way to disambiguate the new annotation with the old annotation.
+% TODO: More explain on the conversion from new annotation to old annotion.
+% TODO: The Java application isn't extendable, report this.
+
 \chapter{Relazione sui compiti svolti}
 \label{cap:relazione}
 
@@ -146,7 +152,7 @@ implementato dalla classe ``AnnotationModel''. Il modello, attraverso lo schema,
 funge da costruttore per oggetti legati ad un documento \textit{MongoDB} e
 provvisti di tutti i metodi per interfacciarsi. In breve, il modello è il
 costruttore dei \gls{DAO}. Nel caso di ``AnnotationModel'' i \gls{DAO}
-costruiti sono inerenti alle annotazioni e legati al documento
+costruiti sono inerenti alle annotazioni e legati alla collezione
 ``\textit{Annotation}''. \\
 
 Una volta completata la parte per accedere e manipolare documenti relativi
@@ -195,8 +201,8 @@ non complicare l'algoritmo d'estrazione. Il corpo centrale del diagramma ha lo
 scopo di ribaltare la relazione tra recensione ed annotazione. Gli attributi:
 \textit{version, start, offset e origin} sono dipendenti dalla recensione in
 cui l'annotazione era stata individuata; perciò vengono inglobati in un unico
-oggetto, identificato con l'id della recensione e inserito nell'annotazione
-nell'attributo ``\textit{reviews}''. Una volta terminate tutte le annotazioni,
+oggetto, identificato con l'id della recensione e inserito nell'attributo
+``\textit{reviews}'' dell'annotazione. Una volta terminate tutte le annotazioni,
 il risultato finale viene trasmetto all'unità successiva.
 
 \begin{figure}[H]
@@ -216,15 +222,268 @@ la relazione tra annotazioni e recensioni cosi da non violare il
 \textit{Single Responsability Principle}.
 
 \subsubsection{Test}
-%
-%\subsection{Applicazione Java per riconoscere le annotazioni}
-%\subsubsection{Requisiti}
-%\subsubsection{Sviluppo}
-%\subsubsection{Test}
-%
-%\subsection{Integrazione con il tool esistente}
-%\subsubsection{Requisiti}
-%\subsubsection{Script d'integrazione}
+I test svolti nel \gls{DAO} hanno riguardato:
+\begin{itemize}
+\item L'effettivo salvataggio dell'annotazione
+\item La gestione dell'aggiunta della recensione ad un'annotazione che era già
+presente nella collezione
+\item Controllo che l'aggiunta avvenga solo nel caso di annotazioni uguali.
+\end{itemize}
+
+Invece per lo \gls{script} d'estrazione e conversione delle annotazioni è stato
+controllato solo se, dato in input un'insieme di recensioni corrette, il
+programma terminasse senza alcun errore.
+
+\subsection{Applicazione Java per riconoscere le annotazioni}
+\subsubsection{Requisiti}
+Il riconoscimento delle annotazioni doveva essere affidato ad un applicazione
+Java in modo da usare la libreria \textit{LingPipe} per garantire una certa
+efficienza nel portare a termine il compito. Il compito era estendere
+un'applicazione Java già esistente, inserendovi le opportune classi per fargli
+svolgere il riconoscimento delle annotazioni all'interno di recensioni. In modo
+da consentire una rapida integrazione con l'editor messo a disposizione agli
+analisti, il formato dell'annotazione doveva essere il medesimo di quello
+seguito dall'editor.
+
+Se rispettati questi requisiti, il modulo \gls{NER} si sarebbe integrato nel
+sistema complessivo della Wonderflow senza provvedere ad eventuali adattamenti
+sia al sistema sia al modulo stesso.
+
+\subsubsection{Sviluppo}
+Non si può negare la vastità di tecniche d'analisi del testo che la libreria
+\textit{LingPipe} mette a disposizione. Correzione ortografica, identificazione
+della lingua, disambiguazione del significato e analista sentimentale sono solo
+alcuni dei possibili problemi che si possono affrontare tramite questa libreria
+in ambiente Java. Un'altro possibile è proprio la
+\textit{Named Entity Recognition}, l'obiettivo del modulo. Attraverso la
+documentazione di \textit{LingPipe} i passi per la creazione di un modulo
+\gls{NER} risultano molto chiari.
+
+Il sistema di riconoscimento funziona attraverso l'adozione di uno o più metodi
+d'individuazione di parole: espressioni regolari, dizionario o modelli
+statistici sono quelli citati. In base al metodo scelto si va ad estendere
+quella che è la classe usata da \textit{LingPipe} per annotare il testo: il
+\textbf{chunk}. Il \textit{chunk} fornisce inoltre un punto d'incontro per tutti
+i vari metodi, consentendone un uso simultaneo. Nel progetto di stage non è
+stata utilizzata questa proprietà, limitandosi all'uso esclusivo del
+\textbf{dizionario}. La scelta è stata compiuta in base al sistema delle
+annotazioni precedentemente realizzato, risultando molto semplice adattare i
+documenti delle annotazioni in entità per il dizionario. Per sistemi \gls{NER}
+\textit{LingPipe} espone l'uso di due tipi di dizionari: quello esatto e quello
+approssimato. Nel prima caso, le parole associate a menzioni vengono
+riconosciute se coincidono alla forma di com'è stata specificata nel dizionario;
+nel secondo, tramite il concetto di \textit{distanza}\footnote{Un esempio è la
+\textit{distanza di Levenshtein}} tra due parole, si possono ottenere i
+riscontri che si avvicinano, ma non combaciano, alle entità del dizionario.
+
+Come prima versione si è scelto di adottare un dizionario esatto per la sua
+facilità d'implementazione e per i discreti risultati che si ottengono, già
+verificati dall'azienda.
+
+Parlando delle entità da definire nel dizionario, queste sono coppie di valori
+\textit{frase-tipo} seguendo la definizione di \textit{Named entity}. Esse
+vengono generate a partire dalle nuove annotazioni la quale, attraverso un
+processo di codifica, si forma la coppia richiesta. Ogni qualvolta venga trovata
+la frase dell'entità nel testo verrà formato un \textit{chunk} contenente:
+la frase stessa, il tipo associato, la posizione di partenza e fine nel testo ed
+il punteggio associato all'entità. Per le annotazioni, il tipo non è altro che
+la compressione delle informazioni non presenti nel \textit{chunk} al fine di
+costruire le annotazioni valide per l'editor. La compressione viene eseguita
+ottenendo i campi \textit{uid, category, text, sentiment} e generata la stringa
+formata dai rispettivi valori separati dalla guardia ``\$\$\$''. Attraverso il
+processo di decodifica del tipo ed i gli altri dati forniti dal \textit{chunk}
+si è in grado di costruire un'annotazione che segua lo schema
+\ref{snippet_annotation_review} associando:
+
+\begin{enumerate}
+\item \textit{category, uid, text} e \textit{sentiment} i valori estratti dal
+tipo
+\item \textit{name} e \textit{syn} è la frase dell'annotazione
+\item \textit{offset} e \textit{start} sono inizializzati attraverso il
+\textit{chunk}: il primo sottraendo la posizione di fine \textit{match} con la
+posizione d'inizio e l'ultimo assegnandoli la posizione d'inizio
+\item \textit{version} viene fissata a ``v2''
+\item \textit{origin} è scelta in base al corpo del testo
+\end{enumerate}
+
+Come richiesto nei requisiti, l'annotazione risultante possiede l'attributo
+\textit{createdBy} inizializzato con il nome della classe che si occupa di
+usare i metodi \textit{LingPipe} per eseguire \gls{NER} e di formare
+l'annotazione richiesta.
+
+La progettazione dell'applicazione è illustrata in figura
+\ref{fig:tag_recognizer}.
+
+``\textit{SentimentMemoryTagRecognizer}'' è la classe che prende le recensioni,
+``\textit{TextReviewForAnalytics}'', e genera la lista delle annotazioni,
+``\textit{Annotation}'', trovate usando \textit{LingPipe}. Il metodo
+\textit{.findTagsInText()} è l'effettivo metodo che riconosce le annotazioni nel
+testo e genera la lista delle annotazioni. Essendo che una recensione può essere
+divisa in tre parti: testo libero, aspetti positivi e negativi;
+\textit{.findTagsInReview()} invoca \textit{.findTagsInText()} e nelle
+annotazioni risultate riporta la provenienza.
+
+L'operazione di compressione e decompressione viene svolta da
+``\textit{SentimentMemoryAnnotationEncoder}'' che espone i metodi necessari per
+effettuare sia la codifica, \textit{.encode()}, sia la codifica,
+\textit{.decode()}.
+
+Infine, ``\textit{SentimentMemoryTagRecognizerFactory}'' è una versione del
+pattern \textit{Factory Method} dove tutta la logica e complessità
+dell'algoritmo di costruzione di un oggetto vengono spostate in un'altra entità
+che se ne fa carico. Nel caso attuale, nel \textit{factory} è racchiusa la
+costruzione del dizionario, necessario alla costruzione di
+``\textit{SentimentMemoryTagRecognizer}'' in modo da applicare la ricerca delle
+annotazioni. Trammite l'uso del pattern si ambisce al
+\gls{separation_of_concerns}, separando come il dizionario viene creato, svolto
+dal ``\textit{SentimentMemoryTagRecognizerFactory}'', e il come viene usato,
+definito in ``\textit{SentimentMemoryTagRecognizer}''.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=7cm]{tag_recognizer}
+\caption{
+Diagramma delle classi per il modulo NER
+}
+\label{fig:tag_recognizer}
+\end{center}
+\end{figure}
+
+Come era successo nello \gls{script} d'estrazione delle annotazioni, anche qui
+si andavano a gestire entità persistenti nell'ecosistema dell'azienda e perciò
+si sono implementanti modelli e \gls{DAO} per rappresentarli e gestirli. Le
+entità coinvolte nel modulo erano tre: annotazioni del glossario, annotazioni
+dell'editor e recensioni. Le ultime due avevano già le classi pronti all'uso,
+mentre per il primo è stato necessario realizzarle.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=6cm]{model_dao_annotation}
+\caption{
+Diagramma delle classi per il modello ed il DAO delle annotazioni
+}
+\label{fig:model_dao_annotation}
+\end{center}
+\end{figure}
+
+Per implementarle entrambi si è usato la libreria Java \textit{Morphia}, driver
+per gestire i documenti di \textit{MongoDB}. Oltre all'accesso effettivo al
+database, necessario per realizzare il \gls{DAO}, \textit{Morphia} estende il
+sistema delle \textit{annotazioni Java} per mappare classi in documenti in modo
+da essere poterli gestire.
+
+Riguardo alle classi create, ``\textit{SentimentMemoryAnnotationDao}'' possiede
+il metodo per ottenere tutte le annotazioni del glossario, cosi da poterle
+caricare nel dizionario di \textit{LingPipe}; mentre
+``\textit{SentimentMemoryAnnotation}'' implementa \textit{getter e setter} per
+gli attributi presenti in un'annotazione.
+
+Per effettivamente eseguire il modulo ci pensa un \textit{runner}, il cui altro
+non è che una implementazione del \textit{Façade pattern} dove ogni metodo sono
+le operazioni eseguibili dall'applicazione Java, compreso il sistema di
+riconoscimento delle annotazioni. Sicuramente questo approccio potrebbe
+degenerare nella formazione di una \textit{fat interface} ma l'azienda non
+prevede l'aggiunta di molte funzionalità al programma. A mio avviso l'uso del
+\textit{Command Patter} avrebbe garantito una maggiore estensibilità, senza
+introdurre difficoltà progettuali. Il comportamento del \textit{runner} viene
+gestito tramite file di configurazione in formato \gls{JSON} dove si vanno a
+specifiare:
+\begin{itemize}
+\item Nome dell'azione da eseguire, attributo \textit{run}
+\item Url del database \textit{MongoDB} da utilizzare, attributo
+\textit{database}
+\end{itemize}
+
+In questa fase non era richiesta l'implementazione del metodo d'avvio del modulo
+\gls{NER} perchè sarebbe stata affrontata durante la fase d'integrazione con
+l'editor usato dagli analisti.
+
+\subsubsection{Test}
+I test sono stati eseguiti sui metodi di
+``\textit{SentimentMemoryTagRecognizerFactory}'' e
+``\textit{SentimentMemoryTagRecognizer}''.
+
+\paragraph{SentimentMemoryTagRecognizerFactory.create()}
+Il test consisteva nella creazione di un'istanza di
+``\textit{SentimentMemoryTagRecognizer}'' con associato un dizionario di
+annotazioni formato da due elementi caricati precedentemente da una collezione
+\textit{MongoDB} in locale. Con \textit{.getDictionary()} di
+``\textit{SentimentMemoryTagRecognizer}'' si andava a recuperare il dizionario
+per estrarre il numero degli elementi contenuti. Il test passava se la
+cardinalità del dizionario coincideva con il numero di annotazioni caricate.
+
+\paragraph{SentimentMemoryTagRecognizer.findTagsInReview()}
+Il test iniziava con la compisizione di una recensione modello con le due
+caratteristiche
+\begin{itemize}
+\item Erano defini le tre parti di una recensione: \textit{pros, cons} e
+\textit{free-text}
+\item Tutte le annotazioni del dizionario erano presenti nelle tre parti.
+\end{itemize}
+successivamente si eseguiva il metodo \textit{.findTagsInReview()} per ottenere
+la lista delle annotazioni. Il test passava quando la lista aveva tanti elementi
+quante le annotazioni attese e ogni annotazioni possedeva il campo
+\textit{sentiment} e \textit{origin} inizializzato con:
+\begin{enumerate}
+\item (0, ``cons'') - se l'annotazione provenisse dai \textit{cons} della
+recensione
+\item (1, ``pros'') - se l'annotazione provenisse dai \textit{pros} della
+recensione
+\item origin uguale a ``free-text'' se l'annotazione provenisse dal
+\textit{free-text} della recensione, l'attributo \textit{sentiment} non viene
+controllato
+\end{enumerate}
+
+\paragraph{SentimentMemoryTagRecognizer.findTagInText()}
+A differenza del test sopra qui si ad assicurare che le annotazioni trovate
+siano complete e ogni attributo abbia il giusto valore. Per eseguirlo si è
+usata direttamente un testo piano, salvato in una stringa, ed eseguito il metodo
+\textit{.findTagInTextTest()} per ottenere la lista di annotazioni presenti.
+
+L'analisi degli attributi veniva eseguita solo su quella in testa alla lista.
+
+\subsection{Integrazione con il tool esistente, l'editor di annotazioni}
+\subsubsection{Requisiti}
+L'unico requisito espresso è che le annotazioni create attraverso l'applicazione
+Java fossero salvate nelle recensioni che si sarebbero andate ad analizzare.
+Più precisamente, le annotazioni sarebbero state aggiunte all'array associato
+all'attributo \textit{feature2sentiment} della recensione.
+
+\subsubsection{Sviluppo}
+Come spiegato nella sezione precedente, per dare la possibilità di avviare il
+modulo era sufficiente aggiungere un metodo al \textit{runner} dell'applicazione
+che eseguisse l'analisi delle recensioni e salvasse i risultati nel database.
+
+Il metodo è riassunto nell'immagine del diagramma di sequenza
+\ref{fig:runner_sequence}.
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[height=8cm]{runner_sequence}
+\caption{
+Diagramma di sequenza per il metodo di esecuzione del modulo NER
+}
+\label{fig:runner_sequence}
+\end{center}
+\end{figure}
+
+Una volta sviluppato le altre operazioni riguardavano solo il file di
+configurazione del modulo \gls{NER}. Nel campo \textit{database} è stato
+riportato l'indirizzo del database aziendale dove sono tenute le collezioni
+delle recensioni e del glossario; invece in \textit{run} si è trascritto il nome
+della \textit{subroutine} di riconoscimento delle annotazioni.
+
+E' da specificare che il processo d'analisi automatica richiede l'intervento
+periodico di un operatore umano, in quanto l'azienda non è in possesso di alcun
+sistema d'automazione.
+
+\subsubsection{Test}
+Non sono stati sviluppati test in quanto le parti che vanno a comporlo sono
+state già collaudate e non si è visto la necessità di crearli visto la
+dimensione ridotta della funzione. Per quanto riguarda il tool usato dagli
+analisti, neanche li vi è stato nessuna creazione di test in quanto il modulo
+per l'editor era già stata creato e collaudato precedentemente dall'azienda.
+
 %\subsubsection{Script di misurazione qualità}
 %
 %\section{Moderazione del glossario}
