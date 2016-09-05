@@ -290,7 +290,8 @@ annotazioni create attraverso il sistema di riconoscimento vengono approvate
 automaticamente essendo prese d'annotazioni precedentemente controllate;
 riducendo anche il tempo del \textit{Senior Analyst} per il controllo qualità.
 
-Nella sezione xx verrà discussa tutta la parte di sviluppo e funzionamento.
+Nella sezione \ref{sec:ner} verrà discussa tutta la parte di sviluppo e
+funzionamento.
 
 \subsection{Moderazione del glossario}
 Con il termine \textit{glossario} definisco il sottoinsieme dell'archivio
@@ -325,8 +326,8 @@ di moderazione che comprende: un'interfaccia grafica per selezionare le
 annotazioni che verranno inserite nel glossario e di uno \gls{script} di
 misurazione degli indici di \textit{precision} e \textit{recall}.
 
-Per la consultazione completa delle due parti si guardi: sezione xx e sezione
-xx.
+Per la consultazione completa delle due parti si guardi: sezione
+\ref{sec:glossary} e sezione xx.
 
 \section{Altri compiti}
 La realizzazione del sistema di riconoscimento automatico era il principale
@@ -386,6 +387,7 @@ a deframmentarlo in parti indipendenti che cooperano tra loro attraverso
 sani principi d'inclusione.
 
 \section{Tecnologie utilizzate}
+\label{sec:tecnologie}
 Data il progetto ad ampio raggio sono state usate una buon numero di tecnologie
 che hanno alzato di molto il valore dell'esperienza.
 
@@ -558,8 +560,8 @@ controllato, ad ogni esecuzione dei test viene eseguita l'istanza di un browser
 per simulare l'interazione dell'utente sulla pagina web; che di un ampio insieme
 di \gls{API} per fornire:
 \begin{itemize}
-\item controllo sull'utente virtuale
-\item analisi sullo stato della pagina web
+\item controllo completo sul \gls{DOM} della pagina
+\item gestione dei servizi del \textit{browser}
 \end{itemize}
 garantendo copertura totale su ogni aspetto dell'applicazione.
 
