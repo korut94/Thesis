@@ -746,26 +746,6 @@ Diagramma delle classi sull'utente virtuale per la moderazione del glossario
 \end{center}
 \end{figure}
 
-Come si può vedere i nomi dei metodi equivalgono alla descrizione dell'azione
-da compiere. Si è pensato di dividere di creare una gerarchia d'utenti in modo
-da inserire azioni generiche nella classe base (vai in una pagina, login, ecc...
-) e le azioni più specifiche dell'applicazione nella classe derivata (conta
-annotazioni, clicca sul numero di recensioni, ecc...). Ora i test per i casi
-d'uso non è altro che la disposizione in modo ordinato delle possibili azioni
-con l'inserimento di un \textit{oracolo} a risultato compiuto. Il gruppo d'
-immagini \ref{fig:uc_user} mostra per ogni attività il relativo metodo da
-invocare, concludendo con la verifica eseguita dall'oracolo.
-
-Per completezza mostro il frammento di codice che esegue il test per il caso d'
-uso UC4. Come si può notare l'oggetto ``\textit{user}'' esegue i suoi metodi
-man mano che si scende nella catena delle \textit{Promise}. La catena viene
-realizzata tramite il \textit{.then()} la quale prende in input il valore
-restituito dalla risoluzione della \textit{Promise} precedente, oppure, se il
-risultato fosse un'ulteriore \textit{Promise} verrebbe prima risolata e dopo
-il risultato verrebbe passato a quella successiva.
-
-\newpage
-
 \begin{center}
 \begin{lstlisting}[
   frame=single,
@@ -790,6 +770,24 @@ describe('USE CASE: get other annotations', function () {
 );
 \end{lstlisting}
 \end{center}
+
+Come si può vedere i nomi dei metodi equivalgono alla descrizione dell'azione
+da compiere. Si è pensato di dividere di creare una gerarchia d'utenti in modo
+da inserire azioni generiche nella classe base (vai in una pagina, login, ecc...
+) e le azioni più specifiche dell'applicazione nella classe derivata (conta
+annotazioni, clicca sul numero di recensioni, ecc...). Ora i test per i casi
+d'uso non è altro che la disposizione in modo ordinato delle possibili azioni
+con l'inserimento di un \textit{oracolo} a risultato compiuto. Il gruppo d'
+immagini \ref{fig:uc_user} mostra per ogni attività il relativo metodo da
+invocare, concludendo con la verifica eseguita dall'oracolo.
+
+Per completezza mostro il frammento di codice che esegue il test per il caso d'
+uso UC4, snippet \ref{code:uc_4}. Come si può notare l'oggetto ``\textit{user}''
+esegue i suoi metodi man mano che si scende nella catena delle \textit{Promise}.
+La catena viene realizzata tramite il \textit{.then()} la quale prende in input
+il valore restituito dalla risoluzione della \textit{Promise} precedente,
+oppure, se il risultato fosse un'ulteriore \textit{Promise} verrebbe prima
+risolata e dopo il risultato verrebbe passato a quella successiva.
 
 \begin{figure}[H]
 \centering
@@ -820,11 +818,6 @@ describe('USE CASE: get other annotations', function () {
 \caption{Diagranna di sequenze per i casi d'uso}
 \label{fig:uc_user}
 \end{figure}
-
-
-
-
-
 
 %\section{Refactoring del BaaS}
 %\subsection{Stato iniziale}
