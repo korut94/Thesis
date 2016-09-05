@@ -3,6 +3,7 @@
 % TODO: Create a way to disambiguate the new annotation with the old annotation.
 % TODO: More explain on the conversion from new annotation to old annotion.
 % TODO: The Java application isn't extendable, report this.
+% TODO: How to work the query compisition
 
 \chapter{Relazione sui compiti svolti}
 \label{cap:relazione}
@@ -23,6 +24,7 @@ sempre potuto godere di una progettazione allegata per via dello scarso
 interesse che l'azienda nutre.
 
 \section{Modulo NER}
+\label{sec:ner}
 \subsection{Esportatore annotazioni dalle recensioni}
 \subsubsection{Requisiti}
 Il funzionamento del modulo NER è strettamente legato al glossario di dove
@@ -105,6 +107,7 @@ al seguente schema:
     "syn": "String",
     "sentiment": 0 | 1,
     "category": "String",
+    "status": "String"
     "reviews": [{
        "id": "String",
        "start": "Number",
@@ -133,6 +136,7 @@ risolvono egregiamente tutte le problematiche riscontrate:
 \item L'annotazione non è più un attributo ma copre il ruolo d'oggetto unico
 \item I riferimenti alla recensione in cui appare l'annotazione vengono salvati
 nel campo ``\textit{reviews}''
+\item Aggiunta attributo ``\textit{status}''
 \end{itemize}
 
 Con la prima modifica si rimuove l'accoppiamento indesiderato con la recensione.
@@ -146,6 +150,10 @@ compito del \textit{insertOrMerge} citato sopra. La sua funzione è di o inserir
 la nuova annotazione se non è già presente o di agganciare i riferimenti alle
 recensioni non ancora presenti nell'attributo ``\textit{reviews}'', mantenendo
 cosi la relazione desiderata.
+
+Infine ``\textit{status}'' viene usato per identificare in quale stato si trova
+l'annotazione: \textit{new, archived} o \textit{approved}. Solo le annotazioni
+\textit{approved} fanno parte di un glossario.
 
 L'ultimo aspetto da chiarire è il \textbf{modello} di \textit{mongoose},
 implementato dalla classe ``AnnotationModel''. Il modello, attraverso lo schema,
@@ -302,8 +310,9 @@ tipo
 \item \textit{offset} e \textit{start} sono inizializzati attraverso il
 \textit{chunk}: il primo sottraendo la posizione di fine \textit{match} con la
 posizione d'inizio e l'ultimo assegnandoli la posizione d'inizio
-\item \textit{version} viene fissata a ``v2''
+\item \textit{version} viene fissato a ``v2''
 \item \textit{origin} è scelta in base al corpo del testo
+\item \textit{status} è inizializzato con il valore ``new''.
 \end{enumerate}
 
 Come richiesto nei requisiti, l'annotazione risultante possiede l'attributo
@@ -480,23 +489,343 @@ sistema d'automazione.
 \subsubsection{Test}
 Non sono stati sviluppati test in quanto le parti che vanno a comporlo sono
 state già collaudate e non si è visto la necessità di crearli visto la
-dimensione ridotta della funzione. Per quanto riguarda il tool usato dagli
-analisti, neanche li vi è stato nessuna creazione di test in quanto il modulo
-per l'editor era già stata creato e collaudato precedentemente dall'azienda.
-
+dimensione ridotta della funzione. Per quanto riguarda il \textit{tool} usato
+dagli analisti, neanche li vi è stato nessuna creazione di test in quanto il
+modulo per l'editor era già stata creato e collaudato precedentemente
+dall'azienda.
 %\subsubsection{Script di misurazione qualità}
 %
-%\section{Moderazione del glossario}
-%\subsection{Comunicazione con il backend}
-%\subsubsection{Funzionamento}
-%\subsubsection{Modello dell'annotazione}
-%\subsubsection{Ampliamento modello della recensione}
-%
-%\subsection{Interfaccia web}
-%\subsubsection{Requisiti}
-%\subsubsection{Sviluppo}
-%\subsubsection{Test}
-%
+
+\section{Moderazione del glossario}
+\label{sec:glossary}
+\subsection{Comunicazione con il backend}
+\subsubsection{Requisiti}
+Prima di partire con lo sviluppo dell'interfaccia per moderare il glossario, era
+necessario creare un collegamento tra l'applicazione web ed i dati archiviati
+nel database.
+
+Come spiegato le applicazioni seguono il modello del
+\gls{single-page-application} ed sono progettate attraverso l'architettura
+\textit{REST}, eseguendo il \gls{front-end} nel \textit{client} ed il
+\gls{back-end} nei \textit{web server} aziendali comunicando via
+\textit{RESTful API} per gestire le risorse. Fondamentalmente, le risorse sono i
+dati archiviati nelle \textit{collection MongoDB} è del compito \gls{back-end}
+fornire tutte le interfaccia per leggerli, scriverli, modificarli e cancellarli.
+
+Però, se venisse applicato il medesimo principio per ogni applicazione
+verrebbero a formarsi una serie di \gls{back-end} la cui unica differenza è
+l'insieme di entità che vanno a gestire, lasciando invariate le operazioni
+\textit{CRUD} sui dati, l'interfacciamento con il database e quello con il
+\gls{front-end}.
+
+La Wonderflow ha evitato questo scenario attraverso la realizzazione di un
+\gls{BaaS}, il cui tutte le loro applicazioni ne fanno uso. La particolarità
+però del servizio è il modo in cui si interagisce. Tutto la programmazione di
+come una nuova applicazione sfrutta le interfacce offerte avviene direttamente
+nell'applicazione, più precisamente, attraverso la costruzione di un
+\textbf{servizio} \textit{AngularJS}. Questi particolari servizi implementano
+il \textit{proxy}, del \textit{Proxy pettern}, dei \gls{DAO} sfruttando le
+interfacce del \gls{BaaS} studiate per essere completamente generiche
+sulle entità da modellare. La scelta di implementare servizi \textit{AngularJS}
+risulta vantaggiosa data la possibilità di usare la \gls{dependency-injection},
+offerta dal \textit{framework}, per connetterli agli altri oggetti.
+
+Nel caso dell'applicazione per la moderazione, bisognava costruire un servizio
+\textit{AngularJS} che fornisse tutti i metodi per modellare le annotazioni del
+glossario.
+
+\subsubsection{Sviluppo}
+Rimanendo in linea con la progettazione seguita per i \gls{DAO} sui pacchetti
+\textit{Node.js}, anche qui si è formata una classe base, dove sono tenute tutte
+lo logiche d'accesso ai dati, ed una figlia per offrire funzionalità specifiche
+sull'entità da modellare. Ovviamente, dato l'uso dell'architettura
+\gls{REST}, la classe base non ha l'accesso fisico al database \textit{MongoDB}
+dove sono tenute le informazioni ma utilizza le \gls{API} del \gls{back-end} per
+ottenerli. La figura \ref{fig:annotation_angular} mostra quanto appena
+descritto.
+
+La classe base fornisce le operazioni \textit{CRUD} sui dati ed implementa il
+sistema di comunicazione col \gls{BaaS} tramite il servizio \textit{\$http} di
+\textit{AngularJS}. Il servizio comanda il \textit{browser} ad inviare richieste
+HTTP con i metodi \textit{GET, POST, PUT} e \textit{DELETE}. Le richieste
+vengono svolte in modo asincrono e la risposta viene rappresentata con
+\textit{Promise}, semplificando la gestione e migliorando la pulizia del codice.
+
+La classe derivata, invece, aggiunge metodi di aggiornamento dei valori di
+un'annotazione e composizione di query per ottenere solo un certo sottoinsieme
+del glossario (si rivelerà sostanzialmente utile nella creazione della GUI),
+in modo da sia applicare filtri categoria, funzione, sentimento e cosi via sia
+per realizzare semplici interrogazione nella collezione, come per esempio
+ottenere tutti i tipi di categoria registrate nelle annotazioni.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=4cm]{annotation_angular}
+\caption{
+Diagramma delle classi sul servizio \textit{AngularJS} sulle annotazioni
+}
+\label{fig:annotation_angular}
+\end{center}
+\end{figure}
+
+\subsubsection{Test}
+I test programmati con il tutor aziendale sono stati rivolti esclusivamente
+sulle operazioni necessarie allo sviluppo dell'editor che consistevano:
+aggiornamento dell'attributo \textit{status} di una annotazione e
+ottenimento di tutti i valori assunti da \textit{category} in tutte le
+annotazioni. I motivi sono spiegati nella prossima sezione.
+
+Visto che si trattava di testare i metodi di un servizio la quale richiede un
+\gls{back-end} si è ricorso all'uso di uno \gls{stub} per imitare le sue
+risposte evitando d'introdurre i tempi di \textit{roundtrip} del sistema.
+Lo \gls{stub} è stato creato usando il servizio \textit{\$httpBackend} di
+\textit{AngularJS} con il quale è molto semplice configurare il risultato in
+base alla richiesta.
+
+\subsection{Interfaccia web}
+\subsubsection{Requisiti}
+Una volta create il servizio per accedere alle annotazioni è possibile produrre
+l'interfaccia con la quale un \textbf{Senior Analyst} potrà scegliere quali far
+entrare nel glossario.
+
+L'interfaccia doveva visualizzare ogni annotazione con i relativi campi
+informativi e, molto importante, doveva essere possibili mostrare le recensioni
+in cui appariva. Quest'ultimo fattore era essenziale al moderatore per eseguire
+operazioni di verifica sull'annotazione, in quanto, garantisce il contesto da
+cui l'annotazione proviene. In caso di un'annotazione poco chiara, solo
+attraverso il testo originale si sarebbe potuto valutarla e attuare una scelta o
+di rifiuto o d'integrazione nel glossario.
+
+Lo stato dell'annotazione doveva essere ben visibile e selezionabile tra i tre
+stati possibili.
+
+Il numero delle annotazione sarebbe potuto diventare molto grande quindi era
+necessario raggruppare le annotazioni in gruppi e mostrarne solo uno per volta.
+Se il \textbf{Senior Analyst}, attraverso un pulsante apposito, ne faceva
+richiesta il successivo gruppo d'annotazioni sarebbe stato aggiunto a quelli già
+presenti. Ogni gruppo doveva essere formato da dieci annotazioni, un numero per
+l'azienda equilibrato che non imponeva costantemente di richiedere un successivo
+gruppo e neanche affollasse lo schermo di annotazioni irrilevanti.
+
+Infine, bisognava creare un filtro di ricerca in base alla categoria dell'
+annotazione ed al suo stato. Oltre, per esempio, mostrare solo le nuove
+annotazioni da revisionare, il \textbf{Senior Analyst} avrebbe potuto sottoporre
+un glossario ad una serie di aggiunte e rimozioni tra annotazioni nuove,
+integrate o precedentemente archiviate, cosi da migliorarne la qualità.
+
+Il risultato doveva essere integrato con l'applicazione web dove vengono tenuti
+tutti gli strumenti riguardanti le recensioni e, di conseguenze, le annotazioni.
+
+\subsubsection{Sviluppo}
+Il layout dell'applicazione è risultato minimalista dato il tempo a disposizione
+per realizzarlo.
+
+La pagina web è divisa in due parti: \textit{header} e \textit{tabella}.
+
+L'\textit{header} è costituito dal titolo dell'applicazione, link di ritorno
+alla pagina principale e sotto il filtro per le annotazioni. Soddisfacendo i
+requisiti, il filtro è composto da due elementi: barra di ricerca per
+selezionare la categoria e selettori dello stato dell'annotazione.
+
+La barra di ricerca è un riutilizzo di quella sviluppata dalla Wonderflow, usata
+in tutte le applicazioni in cui è richiesta cosi da garantire al fruitore
+familiarità con lo strumento. La barra si presenta come un form di testo
+tradizionale ma una volta preso il \textit{focus} mostrerà, attraverso una lista
+a scorrimento, tutte le categorie in cui le annotazioni sono registrate. La
+ricerca avviene tramite la digitazione di testo nell'area testuale, durante
+il quale verranno tenuti tutti i possibili riscontri per lo spezzone scritto
+mentre gli altri verranno eliminati dalla lista.
+
+Per quanto riguarda il selettore dello stato la sua rappresentazione avviene
+tramite tre radio button camuffati in tre bottoni allineati grazie all'uso
+della libreria \textit{bootstrap}. Grazie ad essa oltre che un guadagno in
+termini d'accessibilità lo è anche in estetica, risultando un buon colpo
+d'occhio rispetto ai classici tre pallini selezionabili.
+
+Entrambe queste componenti portano alla modifica della tabella a centro pagina
+dove ogni riga rappresenta un'annotazione presente nell'archivio. La scelta
+d'uso di una tabella è per poter visualizzare ogni attributo dell'annotazione
+in modo chiaro, mantenendo un'alta leggibilità necessaria in caso di sessioni
+prolungate di moderazione. La maggior parte degli attributi viene mostrato come
+testo senza alcuna interazione, al contrario delle celle per il campo
+\textit{reviews} e \textit{status}.
+
+Nelle celle \textit{reviews} appare un numero indicante in quante recensioni
+l'annotazione era stata individuata. Il numero è legato ad il \textit{link} per
+la pagina di visualizzazione delle recensioni con sottolineato il testo dell'
+annotazione interessata. In questo modo quando l'\textbf{analista} desidera
+controllare l'origine dell'annotazione gli basta premere sul link per ottenere
+tutte le recensioni in cui appare. Il formato di questa pagina segue la stessa
+dell'editor testuale agevolando l'utente nella navigazione. L'unica differenza
+sta nell'impossibilità di modificare o annotare le recensioni, limitando
+l'interazione alla sola lettura. L'approccio scelto soddisfa il requisito ma
+risulta inefficace per quanto concerne l'usabilità del sistema, imponendo
+l'utente di consumare due ``\textit{click}'' del mouse per eseguire un'
+operazione di rilievo, uno per saltare alla pagina delle recensioni ed uno per
+tornare indietro. Tuttavia, dopo una discussione con il proponente, la mancata
+visione di un'\textit{opportunity} generava un esiguo livello d'interesse ad un
+cambio d'impostazione del layout, giungendo alla scelta di mantenere quello
+realizzato.
+
+Le celle \textit{status} invece contengono tre pulsanti con il quale si va sia a
+visualizzare lo stato dell'annotazione e sia permettere al
+\textbf{Senior Analyst} di cambiarglielo. I tre pulsanti vengono colorati di due
+colori distinti: blu lo stato attivo e grigio gli altri; permettendo con
+semplicità comprendere in quale stato l'annotazione si trovi. Essendo pulsanti,
+basta premere su quello che rappresenta lo stato voluto per inviare la richiesta
+di aggiornamento (le operazioni sono svolte nel \gls{front-end} ma i dati sono
+nel \gls{back-end}). Se l'operazione avviene senza errori allora il pulsante
+appena premuto si colorerà di blu e l'altro diverrà grigio, altrimenti apparirà
+sullo schermo un messaggio d'errore.
+
+Il cambio di stato dell'annotazione è una delle possibili azioni vincolate alla
+comunicazione con il \textit{back-end} via \textit{Internet} e la lettura e
+scrittura dei dati nel \textit{database}; quindi affette da possibili errori.
+La gestione è stata affrontata in linea a quanto accade nelle altre
+applicazioni ovvero attraverso l'\textit{alert}, scrivendo la causa dell'errore
+e la richiesta di contattare il responsabile tecnico per segnalarvi il
+malfunzionamento.
+
+\subsubsection{Test}
+L'applicazione web è stata il primo punto di prova degli \gls{E2ET} utilizzando
+la libreria \textit{Protractor}. Come discusso nella sezione
+\nameref{sec:tecnologie} la libreria è studiata per integrarsi nell'ambiente
+\textit{AngularJS}, aggiungendo al ricco \textit{set} di strumenti l'esecuzione
+dei test in un \textit{browser} reale dov'è possibile, attraverso le \gls{API}
+di \textit{Protractor}, simulare ogni aspetto dell'applicazione e controllare
+lo stato di ogni elemento nell'interfaccia. Attraverso di essa, effettuare una
+verifica sulla cooperazione degli elementi che compongono l'interfaccia diventa
+semplice ed elegante.
+
+La metodologia utilizzata alla Wonderflow è la creazione preventiva di un
+oggetto utente in cui eseguire le operazioni salienti dell'applicazione. L'uso
+di un utente virtuale conferisce un mezzo con cui veicolare il test, mantenendo
+un altissimo livello d'astrazione completamente indipendente dalla
+progettazione del sistema. Anche dopo uno stravolgimento dell'architettura di
+base se il risultato rimane invariato, essendo gli \gls{E2ET} \textit{black box}
+di natura, non sarò necessario alcun intervento d'aggiornamento sul codice
+dei test. L'oggetto utente avrà come metodi tutte le operazioni che il fruitore
+dell'applicazione naturalmente svolge. Contare il numero di righe di una
+tabella o leggere del testo o guardare il colore di un elemento della pagina
+sono tutti esempi di possibili azioni che vanno tradotte in metodi dell'oggetto.
+
+In specifico al moderatore delle annotazioni è stato realizzato un test per
+ognuno dei seguenti casi d'uso:
+\begin{itemize}
+\item Visualizzazione delle annotazioni (UC1 - \ref{fig:uc_1})
+\item Filtro per categoria (UC2 - \ref{fig:uc_2}) e stato (UC3 - \ref{fig:uc_3})
+\item Richiesta del successivo gruppo d'annotazioni (UC4 - \ref{fig:uc_4})
+\item Visualizzazione recensioni associate alle annotazioni (UC5 -
+\ref{fig:uc_5})
+\end{itemize}
+
+Non tutti i test erano verificabili immediatamente dopo il caricamento della
+pagina web, alcuni richiedevano una serie di passaggi per portare alla
+visualizzazione del risultato interessato. Come detto ogni azione corrisponde
+ad un metodo nell'oggetto utente e ogni metodo è realizzato con le sapienti
+\gls{API} di \textit{Protractor}, risultando una continua generazione di
+\textit{Promise} ad ogni invocazione. Grazie alla loro proprietà di
+``incatenamento'' si è in grado di pilotare l'utente virtuale realizzando una
+serie di compiti da fargli svolgere, portando al completamento del compito.
+
+La progettazione dell'utente non era banale. Il rischio di produrre azioni
+troppo complesse, non sfruttando la concatenazione delle azioni, e troppo
+specifiche sull'applicazione da testare, non sfruttando la loro generalità,
+era presente, vista l'unicità dell'entità da rappresentare. C'era anche da
+considera il rovescio della medaglia. Azioni troppo generiche o troppo piccole
+avrebbero portato ad una sicura verbosità ed una notevole lunghezza della catena
+di compiti da eseguire. Il risultato è mostrato in figura \ref{fig:user_test}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=7cm]{user_test}
+\caption{
+Diagramma delle classi sull'utente virtuale per la moderazione del glossario
+}
+\label{fig:user_test}
+\end{center}
+\end{figure}
+
+Come si può vedere i nomi dei metodi equivalgono alla descrizione dell'azione
+da compiere. Si è pensato di dividere di creare una gerarchia d'utenti in modo
+da inserire azioni generiche nella classe base (vai in una pagina, login, ecc...
+) e le azioni più specifiche dell'applicazione nella classe derivata (conta
+annotazioni, clicca sul numero di recensioni, ecc...). Ora i test per i casi
+d'uso non è altro che la disposizione in modo ordinato delle possibili azioni
+con l'inserimento di un \textit{oracolo} a risultato compiuto. Il gruppo d'
+immagini \ref{fig:uc_user} mostra per ogni attività il relativo metodo da
+invocare, concludendo con la verifica eseguita dall'oracolo.
+
+Per completezza mostro il frammento di codice che esegue il test per il caso d'
+uso UC4. Come si può notare l'oggetto ``\textit{user}'' esegue i suoi metodi
+man mano che si scende nella catena delle \textit{Promise}. La catena viene
+realizzata tramite il \textit{.then()} la quale prende in input il valore
+restituito dalla risoluzione della \textit{Promise} precedente, oppure, se il
+risultato fosse un'ulteriore \textit{Promise} verrebbe prima risolata e dopo
+il risultato verrebbe passato a quella successiva.
+
+\newpage
+
+\begin{center}
+\begin{lstlisting}[
+  frame=single,
+  caption=Codice test per UC4,
+  label=code:uc_4]
+describe('USE CASE: get other annotations', function () {
+  it(
+    'when user clicks "More terms" the other annotations appear',
+    function () {
+      return user.clickOnNextPage().then(function () {
+        return user.countNumberOfAnnotations();
+        /**
+         * Si effettua il concatenamento. Il risultato della
+         * Promise precedente diventa il parametro di quella
+         * successiva.
+         */
+      }).then(function (count) {
+        expect(count).toBeGreaterThan(10);
+      });
+    });
+  }
+);
+\end{lstlisting}
+\end{center}
+
+\begin{figure}[H]
+\centering
+\subfigure[Diagramma di sequenza caso d'uso UC1]{
+  \includegraphics[width=.25\linewidth]{uc_1}
+  \label{fig:uc_1}
+}
+\hfill
+\subfigure[Diagramma di sequenza caso d'uso UC3]{
+    \includegraphics[width=.45\linewidth]{uc_3}
+    \label{fig:uc_3}
+}
+\hfill
+\subfigure[Diagramma di sequenza caso d'uso UC4]{
+    \includegraphics[width=.4\linewidth]{uc_4}
+    \label{fig:uc_4}
+}
+\hfill
+\subfigure[Diagramma di sequenza caso d'uso UC5]{
+    \includegraphics[width=.4\linewidth]{uc_5}
+    \label{fig:uc_5}
+}
+\hfill
+\subfigure[Diagramma di sequenza caso d'uso UC2]{
+    \includegraphics[width=.4\linewidth]{uc_2}
+    \label{fig:uc_2}
+}
+\caption{Diagranna di sequenze per i casi d'uso}
+\label{fig:uc_user}
+\end{figure}
+
+
+
+
+
+
 %\section{Refactoring del BaaS}
 %\subsection{Stato iniziale}
 %
