@@ -4,6 +4,7 @@
 % TODO: More explain on the conversion from new annotation to old annotion.
 % TODO: The Java application isn't extendable, report this.
 % TODO: How to work the query compisition
+% TODO: Change `.bind()` with someother.
 
 \chapter{Relazione sui compiti svolti}
 \label{cap:relazione}
@@ -750,7 +751,9 @@ Diagramma delle classi sull'utente virtuale per la moderazione del glossario
 \begin{lstlisting}[
   frame=single,
   caption=Codice test per UC4,
-  label=code:uc_4]
+  label=code:uc_4,
+  language=Java
+]
 describe('USE CASE: get other annotations', function () {
   it(
     'when user clicks "More terms" the other annotations appear',
@@ -819,30 +822,337 @@ risolata e dopo il risultato verrebbe passato a quella successiva.
 \label{fig:uc_user}
 \end{figure}
 
-%\section{Refactoring del BaaS}
-%\subsection{Stato iniziale}
-%
-%\subsection{Progettazione}
-%
-%\subsection{Ristrutturazione HTTP Handler}
-%\subsubsection{Requisiti}
-%\subsubsection{Funzionamento}
-%\subsubsection{Test}
-%
-%\subsection{Ristrutturazione applicazione Express}
-%\subsubsection{Requisiti}
-%\subsubsection{Funzionamento}
-%\subsubsection{Test}
-%
-%\subsection{Ristrutturazione Wonderflow API}
-%\subsubsection{Requisiti}
-%\subsubsection{Funzionamento}
-%\subsubsection{Test}
-%
-%\subsection{Collaudo e pubblicazione}
-%
-%\section{Generatore Yeoman per applicazioni AngularJS}
-%\subsection{Requisiti}
-%\subsection{Funzionamento}
-%\subsection{Test}
-%
+\newpage
+
+\section{Refactoring del BaaS}
+\subsection{Stato iniziale}
+Una mansione da svolgere era pulire dallo stesso \gls{BaaS} utilizzato dall'
+applicazione web alcune smagliature lasciate durante le fasi di sviluppo.
+
+Il \gls{BaaS} si presenta come l'unione di quattro pacchetti \textit{npm}:
+\begin{itemize}
+\item restful-mongo-utils
+\item restful-mongo2
+\item wonderflow-api-app2
+\item admin.api.wonderflow.co
+\end{itemize}
+ognuno progettato per svolgere un compito diverso come la \textit{Filosofia
+Unix} suggerisce. Si parlerà di ogni componente nelle sezioni successive.
+
+Tuttavia, questa gestione di profonda modularizzazione del codice e le norme d'
+uso del \textit{CVS} ha favorito un'approccio errato nello sviluppo del codice.
+L'errore commesso infatti è strettamente legato a come \textit{npm} gestisce le
+dipendenze di un pacchetto, quindi è necessario avere un quadro generale del
+meccanismo.
+
+In breve, ogni dipendenza dichiarata nel \textit{package.json} viene installata
+all'interno di una cartella generata da \textit{npm} stesso chiamata
+\textit{node\_modules}. Dentro alla directory sono presenti tante directory
+quante sono le dipendenze e al loro interno si trovano i loro file sorgenti e
+un'ulteriore cartella \textit{node\_modules} in cui sono installati le
+dipendenze. L'iterazione di cartelle \textit{node\_modules} continua finché non
+si installi una sottodipendenza che non ha alcun legame con altri pacchetti.
+Vista nel suo complesso, l'installazione delle dipendenze forma un albero che ha
+come radice il progetto corrente e come nodi le varie dipendenze.
+
+Ora inseriamo la variabile versione al sistema delle dipendenze. Nel
+\textit{package.json} è possibile definire la versione delle dipendenze
+attraverso vari operatori che conferisco elasticità o rigidità all'insieme di
+scelte delle versioni. Facendo un esempio, nella dichiarazione della dipendenza
+ad un pacchetto ``A'' si può scegliere fra i seguenti operati:
+\begin{itemize}
+  \item > o < la dipendenza deve avere una versione almeno maggiore o più bassa
+  del valore specificato
+  \item \~{} o = indicano d'installare la version più vicina o esatta di quella
+  specificata
+\end{itemize}
+cosi l'autore di un pacchetto dovrebbero avere il pieno controllo delle
+dipendenze che verranno installate, garantendogli la stabilità del codice che è
+fondamentale quando si mette in pubblica un servizio come il \gls{BaaS}.
+Sorprendentemente però la situazione non è cosi. La scela della versione delle
+dipendeze è limitata a solo il primo livello dell'albero, lasciando per i
+livelli successivi quelle specificate dall'autore. Perciò non è possibile
+garantire che l'istanza dell'albero delle dipendenze rimanga costante.
+Poniamo nell'esempio che ``A'' abbia come dipendenza ``B''. Se l'autore di ``A''
+avesse specificato che la versione ``B'' potesse essere una qualunque superiore
+ad una soglia minima, ciò implicava che nel momento in cui vi fossero nuove
+versioni di ``B'' queste verrebbero installate. Dunque se al primo livello
+fissassi la versione di ``A'' non ci sarebbe alcuna garanzia di ottenere sempre
+la stessa versione di ``B'', portando ad un'instabilità di fondo nel sistema.
+La Wonderflow decise di risolvere il problema inserendo nei \textit{repository}
+Git lo stato della directory \textit{node\_modules} nel momento in cui il
+software risultasse maturo da essere rilasciato. Cosi facendo ogni installazione
+del software avrebbe mantenuto versioni consistenti delle dipendenze, garantendo
+stabilità.
+
+Tuttavia l'approccio scelto viola un principio del software del controllo di
+versione, ossia: non effettuare il \gls{check} dei file derivati direttamente da
+altri tramite una semplice trasformazione. In questo caso la trasformazione è
+l'installazione delle dipendenze effettuata da \textit{npm}, partendo dal file
+\textit{package.json}, sfociando in una \textit{ridondanza} dei dati e portando
+il controllo di versione ad essere \textit{error-prone}\footnote{Propenso all'
+errore}.
+
+La situazione riguardante i quattro pacchetti \textit{npm} era la seguente: ad
+ognuno era associato un repository \textit{Git} dove effettuare il controllo di
+versione. Per il discorso sulla stabilità del software, all'interno dei
+repository erano presenti anche i rispettivi \textit{node\_modules} con le
+dipendenze installate. Ora, la relazione tra i pacchetti era d'incapsulamento
+l'uno di seguito all'altro fino ad arrivare ad \textit{admin.api.wonderflow.co};
+colui che completa ed avvia il \gls{BaaS}. Ciò comporta che anche le dipendenze
+sono innestate l'una dentro l'altra e, per via del limitato controllo, solo
+nella dipendenza figlia si ha un controllo diretto.
+
+Nello scenario di una modifica di uno dei moduli, affinché si aggiornino
+tutti, sarebbe necessario applicare la procedura d'installazione ricorsivamete
+nei repository dei moduli salendo i livelli di dipendenza fino ad arrivare ad
+\textit{admin.api.wonderflow.co}, la radice dell'albero; con la conseguente
+perdita cospicua di tempo.
+
+A causa di tempistiche strette, lo sviluppo e gli aggiornamenti delle dipendenze
+vennero effettuati nelle versioni all'interno di \textit{node\_modules} in
+\textit{admin.api.wonderflow.co}, evitando di eseguire i passaggi d'
+aggiornamento ma lasciando versioni obsolete del codice nei \textit{repository}.
+
+Il principale compito da svolgere era riportare il codice sorgente nei propri
+\textit{repository}, rimpiazzando il codice con quello aggiornato in modo da
+tornare allo sviluppo separato delle componenti. Durante lo spostamento ci si è
+anche impegnati a risolvere alcune magagne progettuali, tentando di scongiurare
+possibili malfunzionamenti futuri. In ogni sezione si spiegheranno i problemi
+riscontrati e le soluzioni adottate.
+
+\subsection{Ristrutturazione HTTP Handler}
+\subsubsection{Requisiti}
+Il pacchetto \textit{restful-mongo-utils} ha il compito di esportare gestori per
+le richiesta HTTP \textit{get, post, put} e \textit{delete}. I gestori vengono
+realizzati tramite funzioni in cui andavano a implementare la logica per l'
+accesso ai dati nei \textit{database MongoDB}, fornendo cosi le \gls{API}
+generiche utilizzate per sopperire il bisogno di costruire un \gls{back-end}
+``ad hoc'' per le applicazioni web.
+
+Nella situazione precedente al \gls{refactoring} i gestori esposti coprivano
+solo le richieste \textit{put e delete}, mente per \textit{get} e \textit{post}
+erano stati sviluppati direttamente nel pacchetto \textit{restful-mongo2} il
+quale ambisce a tutt'altro scopo. In più l'organizzazione interna di
+\textit{restful-mongo-utils} era spartana, inadatta alle possibili evoluzioni
+del software. In figura \ref{fig:restful_mongo} è rappresentata la situazione
+originale.
+
+Svolgere degli interventi per spostare i gestori HTTP dal pacchetto
+\textit{restful-mongo2} e riorganizzare \textit{restful-mongo-utils} avrebbe
+di sicuro giovato al sistema complessivo.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=5cm]{restful_mongo}
+\caption{
+Diagramma delle classi sulla composizione degli \textit{HTTP Handler}
+}
+\label{fig:restful_mongo}
+\end{center}
+\end{figure}
+
+\subsubsection{Sviluppo}
+La prima operazione compiuta è stata portare ``\textit{HttpGet}'' e
+``\textit{HttpPost}'' in \textit{restful-mongo-utils}. Inoltre il package
+``\textit{restful-mongo2::utils}'' è stato integrato con
+``\textit{restful-mongo-utils::utils}'' in quanto possedeva alcuni strumenti
+usati per i gestori dei metodi \textit{get} e \textit{post}. Una volta
+raggruppati tutti gli \textit{handlers} HTTP si è ristrutturato il pacchetto
+come mostrato in figura sotto (\ref{fig:ref_restfulmongo}).
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=7cm]{ref_restfulmongo}
+\caption{
+Diagramma delle classi \textit{restful-mongo-utils} dopo il \textit{refactoring}
+}
+\label{fig:ref_restfulmongo}
+\end{center}
+\end{figure}
+
+I gestori ora sono stati convertiti in classi dove ogni attributo è un funtore
+associato ad un \gls{API}, risultando una struttura più pulita. Il metodo
+\textit{.bind()} ha lo scopo di poter esportare i funtori al di fuori dalle
+classi ma mantenendo il riferimento al giusto \textbf{this}. Nelle applicazioni
+\textit{Express}, dove le risorse corrispondono a delle \textit{callback},
+diventava impossibile utilizzare \textit{restful-mongo-utils} senza questo
+approccio. Ovviamente diventava necessario invocare sempre il \textit{.bind()}
+prima di utilizzare i funtori ed è per questo che ``\textit{Handler}'' è stata
+inserito. La classe implementa il \textit{Façade pattern}, dando un unico punto
+d'accesso al pacchetto, e fornisce i funtori esportati correttamente invocando
+il metodo \textit{.bind()}. Un'obiettivo raggiunto dal \textit{Façade} era l'
+esposizione di un'interfaccia compatibile a quella della versione prima.
+In tal modo non sarebbe stata necessario alcuna operazione d'adattamento in
+\textit{restful-mongo2}, velocizzando il completamento del \textit{refactoring}.
+
+\subsubsection{Test}
+I test svolti sono stati importati sia dalla vecchia versione di
+\textit{restful-mongo-utils} e sia da \textit{restful-mongo2}, nel quale
+andavano a verificare il funzionamento dei funtori dei gestori e la loro
+corretta integrazione con un'applicazione \textit{Express}. Il riutilizzo dei
+test è stato pensato per poter accertare la completa retrocompatibilità con
+l'interfaccia precedente.
+
+\subsection{Ristrutturazione applicazione Express}
+I tre pacchetti mancanti da ristrutturare condividono il medesimo obiettivo:
+provvedere \gls{API} all'applicazione \textit{Express}.
+
+Infatti ognuno di loro prendevano un oggetto \textit{Express} dove definire per
+ogni metodo HTTP un \gls{API} legata ad un certo ambito, nello specifico:
+\begin{itemize}
+\item \textit{restful-mongo2} - operazioni \textit{CRUD} al database
+\item \textit{wonderflow-api-app2} - gestione utenti e privilegi d'accesso
+\item \textit{admin.api.wonderflow.co} - sezione amministratore e avvio
+\gls{back-end}
+\end{itemize}
+
+tutte insieme fornivano le funzionalità richieste dal sistema \gls{BaaS}.
+
+Nell'ottica del \textit{refactoring} ad ognuna di loro è stata applicata la
+medesima procedura: installazione della dipendenza aggiornata, sostituzione del
+codice nel proprio \textit{repository} ed esecuzione dei test d'unità, senza
+alcun ulteriore intervento.
+
+\subsection{Collaudo e pubblicazione}
+Una volta conclusa l'operazione di \textit{refactoring} era possibile passare
+a testare che le modifiche apportate non abbiano introdotto errori per il quale
+le applicazioni web generavano comportamenti anomali. La Wonderflow archivia
+tutta una batteria di \gls{E2ET} dove vanno a simulare ogni azione di rilievo
+delle varie applicazioni web, la quale richiedono il \gls{BaaS} per funzionare.
+L'ambiente di simulazione d'interazione tra \gls{front-end} e \gls{back-end}
+veniva costruito sfruttando l'eccezionale sistema di composizione offerto da
+\textit{Docker}. Praticamente si creano tre \textit{immagini Docker}, una per
+ognuna delle parti coinvolte, e si va a comporre l'infrastruttura del sistema
+da modellare. Le immagini rappresentano il componente autonomo del sistema, con
+tutte le risorse necessarie per eseguire. Nel caso del \gls{BaaS} ristrutturato,
+l'immagine conterrà il pacchetto \textit{admin.api.wonderflow.co}, tutte le
+sue dipendenze nel \textit{node\_modules} e un file di configurazione con
+descritta la procedura d'avvio dell'applicazione \textit{Express} una volta
+che l'immagine sarà montata. Le immagini eseguite da \textit{Docker} vengono
+chiamate \textit{container}.
+
+Il sistema di test (immagine \ref{fig:stack_docker}) sarà in esecuzione al
+fianco del sistema operativo e sarà perciò interagibile in ogni istanze.
+
+Quando il \gls{BaaS} avrà superato tutti gli \gls{E2ET} sarà possibile
+pubblicare la nuova versione dell'immagine \textit{Docker} ed installarla nei
+server aziendali.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height=7cm]{stack_docker}
+\caption{
+Rappresentazione dell'infrastruttura composta tramite \textit{Docker}
+}
+\label{fig:stack_docker}
+\end{center}
+\end{figure}
+
+\section{Generatore Yeoman per applicazioni AngularJS}
+\subsection{Requisiti}
+\textit{AngularJS} spinge alla divisione in componenti e al loro massiccio
+riutilizzo. Tuttavia l'inizio di un loro sviluppo diventava una procedura
+macchinosa e ripetitiva: tra inizializzazione del pacchetto \textit{npm},
+quello \textit{Bower.js}\footnote{molto simile ad \textit{npm} ma orientato per
+il web} e le configurazione di \textit{karma}, lo sviluppatore doveva spendere
+ vari minuti per ottenere un ambiente di lavoro operativo.
+
+La Wonderflow ha pensato che un miglioramento nello sviluppo sarebbe stato di
+rimuovere il tempo di \textit{overhead} per costruire componenti
+\textit{Angular.js} attraverso un \textit{Yeoman Generator}.
+
+\textit{Yeoman} è programma, sempre nell'ambiente \textit{Node.js}, il quale
+gestisce generatori script previsti per la creare strutture come file o
+directory. I generatori sono pacchetti \textit{npm} che seguono la struttura
+imposta da \textit{Yeoman} che, brevemente, richiede di inserire il progetto
+in una cartella nominata ``generators'' e, da li in poi, ogni sottocartella
+definisce le parti del progetto realizzabili.
+
+Il generatore doveva poter essere in grado di creare:
+\begin{itemize}
+\item direttive \textit{Angular.js}, con relativi test
+\item servizi \textit{Angular.js}, con relativi test
+\item ambiente di lavoro con configurazione di \textit{npm}, \textit{bower} e
+\textit{karma}
+\end{itemize}
+
+Inoltre alcuni aspetti richiedevano la configurazione manuale perciò era
+importante utilizzare i sistemi d'interazione offerti da \textit{Yeoman} per
+permettere all'utente di scegliere alcune opzioni
+
+\subsection{Sviluppo}
+Essendo tre le parti generabili da \textit{Yeoman}, all'interno della cartella
+``generator'' sono stati inserite le sottocartella: \textit{app},
+\textit{service} e \textit{directive}; ognuna tiene la logica di costruzione
+delle varie parti del progetto ed i template dei file che verranno creati.
+\textit{Yeoman} elabora i template utilizzando \textit{EJS}, una libreria
+leggera e performante nella quale attraverso un sistema di segnaposti e
+\textit{scope} simile ad \textit{AngularJS} divide molto bene il contenuto,
+generato dalla logica, dalla presentazione, il contenuto statico del file.
+
+Nei seguenti paragrafi sono trattati i componenti descrivendone la struttura e
+la creazione.
+
+\paragraph{app}
+Soddisfa l'inizializzazione dell'ambiente di sviluppo, generando la struttura
+dei file seguenti:
+\begin{center}
+\begin{lstlisting}[
+  frame=single,
+  caption=Struttura progetto inizializzato
+]
+\
++ npm.json
++ bower.json
++ karma.conf.js
+\end{lstlisting}
+\end{center}
+
+Tramite i primi il componente \textit{AngularJS} ha già le dipendenze dichiarate
+ed alcuni campi informativi riempiti con i valori di base. Il file
+``\textit{karma.conf.js}'' dichiara l'ambiente con il quale eseguire gli
+\gls{E2ET} del componente, al cui interno sono già definite le opzioni usate
+comunemente dall'azienda.
+
+I parametri richiesti dall'utente riguardano il nome del componente, una sua
+descrizione e la licenza con il quale pubblicarlo. Tutte sono inseribili all'
+avvio del generatore tramite l'interfaccia da terminale offerta da
+\textit{Yeoman}.
+
+\paragraph{service}
+Soddisfa la crezione di un servizio \textit{AngularJS} con l'inserimento del
+relativo file di test. La struttura generata era la seguente:
+\begin{center}
+\begin{lstlisting}[
+  frame=single,
+  caption=Struttura servizio \textit{AngularJS}
+]
+\
++ `name`.js
++ test/
++ --- spec/
++ --- --- `name`.js
+\end{lstlisting}
+\end{center}
+
+Il generatore crea il servizio già con l'intestazione pronta, lasciando allo
+sviluppatore solo la programmazione del corpo centrale. Il nome del file sono
+tra apici perché indicano che il nome del servizio è un parametro preso in
+input all'avvio del generatore. In questo caso, il generatore esegue il
+\textit{parsing} delle opzioni dalla linea di comando data per avviarlo.
+
+\paragraph{directive}
+Soddisfa la creazione delle direttive \textit{AngularJS}. La struttura generata
+era identica a quella per il \textit{service}, con l'unica differenze
+riscontrabile nel contenuto dei file. In ogni caso, anche qui lo sviluppatore si
+troverà i file con l'intestazione pronta, necessitando solo la realizzazione
+della direttiva.
+
+\subsection{Test}
+La particolarità di produrre test per generatori \textit{Yeoman} sono due:
+creazione di un ambiente temporaneo di test e formazione di \textit{driver} per
+il passaggio delle opzioni. La prima è per verificare che le condizioni dello
+scenario di lavoro soddisfi i requisiti. La seconda invece è per controllare il
+comportamento del generatore in base all'input. Per entrambe \textit{Yeoman}
+offre due librerie specifiche per raggiungere l'obiettivo.
