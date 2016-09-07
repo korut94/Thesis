@@ -16,7 +16,7 @@ non, il compito principale della Wonderflow è di ottenere queste informazioni.
 
 Le preziosi fonti, dove l'azienda attinge, sono le recensioni dei prodotti
 degli utenti nei più grandi servizi di vendita online (es. Amazon), in cui è
-subito disponibile un loro cospicuo numero senza limiti e costi aggiunti
+subito disponibile un loro cospicuo numero senza limiti e costi aggiunti,
 rendendo davvero semplice l'operazione di raccolta dati. La recensione
 però è un'informazione grezza, non immediatamente utilizzabile per le seguenti
 ragioni:
@@ -27,7 +27,7 @@ ragioni:
 \item Può essere scritta in più lingue
 \end{itemize}
 
-tutto ciò dovuto all'autore della recensione: l'umano. \\
+tutto ciò dovuto all'autore della recensione: l'umano.
 
 A fronte di questo, la Wonderflow ha progettato un processo di raffinamento
 (fig. \ref{fig:review_process}) per poter usufruire delle informazioni
@@ -58,7 +58,7 @@ un dipendente, solitamente uno sviluppatore. Il motivo è che la procedura
 richiede l'avvio di una serie di \gls{script} e controlli fuori dalle
 competenze di personale con conoscenze canoniche d'informatica.
 Una volta scaricate le recensioni dai vari siti web di vendita online, esse
-vengono passate all'\textit{Operations Manager} in modo che possa distribuirle
+vengono passate all'\textbf{Operations Manager} in modo che possa distribuirle
 tra i vari \textbf{analisti} in base alla disponibilità e alle abilità.
 
 Una volta che l'analista ha a disposizione le recensioni da analizzare può
@@ -66,19 +66,18 @@ iniziare a cercare le \textbf{annotazioni}. Come detto precedentemente le
 annotazioni sono testo in cui si può dedurre un \textbf{sentimento} su un
 aspetto del prodotto.
 
-Essendo che in una recensione l'autore può aver dato più commenti sulle varie
+Essendo che in una recensione l'autore può aver dato commenti su più 
 caratteristiche dell'articolo ci si aspetta di avere un'annotazione, o più, per
 ogni commento. E' da precisare che il testo dell'annotazione non coincide quasi
 mai con il testo del commento ma è ben si una sua sottoparte che possa
 rappresentarlo al meglio.
 
-La procedura per individuare annotazioni viene eseguita in un tool interno
-chiamato \textbf{Admin Wonderflow} dove, tra i tanti servizi offerti, vi è
+La procedura per individuare annotazioni viene eseguita in un \textit{tool}
+interno chiamato \textbf{Admin Wonderflow} dove, tra le tante funzionalità, vi è
 l'\textbf{editor} di selezione delle annotazioni. L'analista, una volta aperto
-l'editor, è in grado di selezionare la recensione, visualizzarne il contenuto ed
-iniziare l'analisi. Per creare un'annotazione inseribile nel sistema
-informatico aziendale, l'analista deve necessariamente seguire la seguente
-serie di passaggi:
+l'editor, è in grado di visualizzare la recensione assegnateli ed iniziare l'
+analisi. Per creare un'annotazione inseribile nel sistema informatico aziendale, 
+l'analista deve necessariamente seguire la seguente procedura:
 
 \paragraph{Evidenziarla}
 \label{evidenziarla}
@@ -110,7 +109,7 @@ associare per ogni annotazione una delle categorie offerte dall'editor.
 \paragraph{Salvarla}
 \label{salvarla}
 L'analista dichiara di aver terminato l'analisi di una recensione e sottomette
-le annotazioni prodotte al controllo qualità. \\
+le annotazioni prodotte al controllo qualità.
 
 Durante questa procedura verrà generata una struttura dati in formato \gls{JSON}
 al cui interno vi è un attributo contenente la lista delle annotazioni. Ogni
@@ -196,13 +195,13 @@ pregi oppure nei difetti &
 \end{longtable}
 \end{center}
 
-Una volta che l'annotazione è stata revisionata dal \textit{Senior Analyst},
-risultando positiva ai test sulla qualità, può essere archiviata ed elaborata
-dal sistema per poter fornire dati alla \textbf{Wonderboard}. È doveroso
-aggiungere una nota: l'oggetto salvato nell'archivio è la rappresentazione
-della recensione al cui interno sono presenti le annotazioni; di tutta la serie
-di campi che compongono l'oggetto solo una piccola parte verrà trattata durante
-la relazione.
+Una volta che le annotazione associate alla recenzione siano state revisionate
+dal \textbf{Senior Analyst}, risultando positiva ai test sulla qualità, potranno
+essere archiviate ed elaborata dal sistema per poter fornire i dati alla
+\textbf{Wonderboard}. È doveroso aggiungere una nota: l'oggetto salvato nell'
+archivio è la rappresentazione della recensione al cui interno sono presenti
+le annotazioni. Di tutta la serie di campi che compongono l'oggetto solo una
+piccola parte verrà trattata durante la relazione.
 
 \subsection{Errori nel processo d'analisi}
 Il processo d'analisi delle recensioni è di primaria importanza in quanto
@@ -211,7 +210,7 @@ Tuttavia per poterlo eseguire, si è costretti a richiedere continuamente
 l'intervento di operatori umani data la natura non automatizzabile delle
 operazioni che si vanno a compiere.
 
-Ne consegue che il sistema perde la scalabilità, aumenta i costi di mantenimento
+Ne consegue che il sistema perde la scalabilità, aumentano i costi di mantenimento
 ma soprattutto è necessaria un'attenta e costante supervisione del lavoro svolto
 dagli analisti che può facilmente essere soggetto ad errori.
 
@@ -246,18 +245,18 @@ Questo porta l'analista a svolgere un lavoro frettoloso.
 Ora che è stato introdotto il quadro generale per l'estrapolazione delle
 annotazioni dentro le recensioni, è possibile parlare dell'obiettivo dello stage
 tenuto presso la Wonderflow. Come è stato detto un grosso problema è l'analisi
-delle recensioni tenuta dall'analista, la quale sovente commette una serie
-d'errori che deficitano la produttività dell'azienda.
+delle recensioni tenuta dall'analista il quale, sovente, commette una serie
+d'errori che minano la produttività dell'azienda.
 
 In questa sezione verranno esposi le varie componenti sviluppate nel corso dello
-stage al fine di ridurre gli errori e garantendo un miglioramento dell'efficacia
+stage al fine di ridurre gli errori e garantire un miglioramento dell'efficacia
 nel processo di analisi delle recensioni.
 
 \subsection{Il modulo NER}
 Il progetto di stage mira al miglioramento del lavoro dell'analista introducendo
 un supporto nell'individuazione delle possibile annotazioni. Più precisamente
-si tratta di un modulo \gls{NER} grafico il quale individua nelle recensioni
-annotazioni basandosi su quelle precedentemente archiviate.
+si tratta di un modulo \gls{NER} grafico il quale individua le annotazioni 
+basandosi su quelle precedentemente archiviate.
 
 Il suo uso è molto semplice: all'analista, entrando nell'editor, gli vengono
 immediatamente suggerite delle possibili annotazioni nello stesso formato di
