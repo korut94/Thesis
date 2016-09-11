@@ -28,12 +28,12 @@ interesse che l'azienda nutre.
 \label{sec:ner}
 \subsection{Esportatore annotazioni dalle recensioni}
 \subsubsection{Requisiti}
-Il funzionamento del modulo NER è strettamente legato al glossario di dove
-pesca le annotazioni. Inizialmente il glossario è vuoto quindi i primi risultati
-riporteranno la completa assenza di supporto da parte del modulo, ma man mano
-che vengano aggiunte nuove annotazioni il sistema d'individuazione inizierà a
-svolgere il suo compito. Tuttavia la qualità del servizio nei primi periodi
-risentirà della scarsità d'annotazioni raccolte, impedendo di ottenere
+Il funzionamento del modulo NER è strettamente legato al glossario, la fonte 
+dove pesca le annotazioni. Inizialmente il glossario è vuoto quindi i primi 
+risultati riporteranno la completa assenza di supporto da parte del modulo, ma 
+man mano che vengano aggiunte nuove annotazioni il sistema d'individuazione 
+inizierà a svolgere il suo compito. Tuttavia la qualità del servizio nei primi 
+periodi risentirà della scarsità d'annotazioni raccolte, impedendo di ottenere
 suggerimenti che siano un'aiuto concreto all'analista.
 
 Per evitare le basse \textit{performance} iniziali, la Wonderflow ha composto
@@ -41,8 +41,8 @@ un insieme di recensioni dove erano presenti annotazioni attentamente
 controllate dai \textbf{Senior Analyst} la quale potevano offrire una buona base
 di partenza per il glossario.
 
-Il fatto delle annotazioni salvate come attributo della recensione d'origine
-però poneva grossi problemi. In primo luogo, ogni programma che gestiva solo
+Però il fatto delle annotazioni salvate come attributo della recensione d'origine
+poneva grossi problemi. In primo luogo, ogni programma che gestiva solo
 annotazioni avrebbe dovuto conoscere lo schema delle recensioni, creando un
 accoppiamento indesiderato; secondo, la semplicità di gestione ed uso
 dell'archivio verrebbe meno, principalmente per il fatto di non avere una
@@ -91,9 +91,9 @@ vengono implementati i \gls{DAO}. Vi sono due elementi elementi in
 \textit{mongoose}: lo \textbf{schema} ed il \textbf{modello}.
 
 Il primo è ciò che rende questo pacchetto molto versatile alla modellazione dei
-dati di un'applicazione. Attraverso la definizione di un oggetto in JavaScript è
-possibile definire di quali \textbf{attributi} il dato da modellare è composto e
-quali metodi il \gls{DAO} ha per interfacciarsi con esso. Nel caso in specie
+dati di un'applicazione. Attraverso la definizione di un oggetto in JavaScript, 
+è possibile definire di quali \textbf{attributi} il dato da modellare è composto
+e quali metodi il \gls{DAO} ha per interfacciarsi con esso. Nel caso in specie,
 ``\textit{AnnotationSchema}'' definisce come ``annotazione'' un oggetto conforme
 al seguente schema:
 \begin{center}
@@ -125,9 +125,8 @@ delete)}\footnote{Per una maggior trattazione si veda
 \url{http://coursework.vschool.io/mongoose-crud/}}, implementati dal
 ``\textit{model}'' base di \textit{mongoose}, ed il metodo per effettuare la
 connessione al database da ``\textit{MySchema}''. Inoltre aggiunge un
-ulteriore metodo di classe: ``\textit{insertOrMerge}''.
-
-La descrizione del metodo verrà approfondita in seguito.
+ulteriore metodo di classe: ``\textit{insertOrMerge}'', di cui se ne 
+approfondirà in seguito.
 
 Come si può notare il nuovo schema dell'annotazione è molto simile a quello
 risultante dal processo d'analisi, discusso nella sezione
@@ -144,13 +143,13 @@ Con la prima modifica si rimuove l'accoppiamento indesiderato con la recensione.
 Ora un qualsiasi programma che avesse esclusivamente bisogno delle annotazioni
 non è vincolato a conoscere la struttura delle recensioni.
 
-Con la seconda modifica invece gira la relazione \textit{uno a molti} tra
+Con la seconda modifica invece si gira la relazione \textit{uno a molti} tra
 la recensione e l'annotazione, ottenendo che nell'annotazione si mantengono i
 riferimenti alle recensioni in cui appare. La gestione dei riferimenti è
 compito del \textit{insertOrMerge} citato sopra. La sua funzione è di o inserire
-la nuova annotazione se non è già presente o di agganciare i riferimenti alle
-recensioni non ancora presenti nell'attributo ``\textit{reviews}'', mantenendo
-cosi la relazione desiderata.
+la nuova annotazione se non è già presente o di agganciare i suoi riferimenti 
+alle recensioni non ancora presenti nell'attributo ``\textit{reviews}'' di 
+quella presente, mantenendo cosi la relazione desiderata.
 
 Infine ``\textit{status}'' viene usato per identificare in quale stato si trova
 l'annotazione: \textit{new, archived} o \textit{approved}. Solo le annotazioni
@@ -162,7 +161,7 @@ funge da costruttore per oggetti legati ad un documento \textit{MongoDB} e
 provvisti di tutti i metodi per interfacciarsi. In breve, il modello è il
 costruttore dei \gls{DAO}. Nel caso di ``AnnotationModel'' i \gls{DAO}
 costruiti sono inerenti alle annotazioni e legati alla collezione
-``\textit{Annotation}''. \\
+``\textit{Annotation}''.
 
 Una volta completata la parte per accedere e manipolare documenti relativi
 alla nuova struttura dell'annotazione, si è prodotto lo \gls{script} per
@@ -190,8 +189,8 @@ annotazioni
 \item AnnotationWriter - scrive le annotazioni nell'archivio
 \end{itemize}
 
-Il ``ReaderData'' usa il \gls{DAO} apposito per le recensioni per leggerle tutte
-e generare uno ``\textit{stream}'' con il quale le invierà, di volta in volta,
+Il ``ReaderData'' usa il \gls{DAO} adibito alle recensioni per leggerle tutte
+e generare uno ``\textit{stream}'' con il quale inviarle, di volta in volta,
 all'``AnnotationExtractor'' tramite il metodo \textit{.pipe()}.
 
 Il metodo permette la comunicazione tra le unità consecutive della
@@ -225,8 +224,8 @@ Diagramma d'attività trasformazione annotazioni
 \end{figure}
 
 ``AnnotationWriter'' per salvare le annotazioni ricevute nel database, invoca il
-metodo \textit{.insertOrMerge()} del \gls{DAO} creato nella fase precedente. In
-tal modo, l'unità di scrittura, non dovrà preoccuparsi di come venga mantenuta
+metodo \textit{.insertOrMerge()} del \gls{DAO} discusso precedente. In tal modo,
+l'unità di scrittura, non dovrà preoccuparsi di come venga mantenuta
 la relazione tra annotazioni e recensioni cosi da non violare il
 \textit{Single Responsability Principle}.
 
@@ -252,7 +251,7 @@ un'applicazione Java già esistente, inserendovi le opportune classi per fargli
 svolgere il riconoscimento delle annotazioni all'interno di recensioni. In modo
 da consentire una rapida integrazione con l'editor messo a disposizione agli
 analisti, il formato dell'annotazione doveva essere il medesimo di quello
-seguito dall'editor.
+seguito dall'editor e doveva essere specificata l'origine dal modulo \gls{NER}.
 
 Se rispettati questi requisiti, il modulo \gls{NER} si sarebbe integrato nel
 sistema complessivo della Wonderflow senza provvedere ad eventuali adattamenti
@@ -266,14 +265,14 @@ alcuni dei possibili problemi che si possono affrontare tramite questa libreria
 in ambiente Java. Un'altro possibile è proprio la
 \textit{Named Entity Recognition}, l'obiettivo del modulo. Attraverso la
 documentazione di \textit{LingPipe} i passi per la creazione di un modulo
-\gls{NER} risultano molto chiari.
+\gls{NER} sono risultati molto chiari.
 
 Il sistema di riconoscimento funziona attraverso l'adozione di uno o più metodi
-d'individuazione di parole: espressioni regolari, dizionario o modelli
+d'individuazione di parole: espressioni regolari, dizionari o modelli
 statistici sono quelli citati. In base al metodo scelto si va ad estendere
 quella che è la classe usata da \textit{LingPipe} per annotare il testo: il
-\textbf{chunk}. Il \textit{chunk} fornisce inoltre un punto d'incontro per tutti
-i vari metodi, consentendone un uso simultaneo. Nel progetto di stage non è
+\textbf{chunk}. Il \textit{chunk} fornisce un punto d'incontro per tutti i vari
+metodi, consentendone un uso simultaneo. Nel progetto di stage non è
 stata utilizzata questa proprietà, limitandosi all'uso esclusivo del
 \textbf{dizionario}. La scelta è stata compiuta in base al sistema delle
 annotazioni precedentemente realizzato, risultando molto semplice adattare i
@@ -283,7 +282,7 @@ approssimato. Nel prima caso, le parole associate a menzioni vengono
 riconosciute se coincidono alla forma di com'è stata specificata nel dizionario;
 nel secondo, tramite il concetto di \textit{distanza}\footnote{Un esempio è la
 \textit{distanza di Levenshtein}} tra due parole, si possono ottenere i
-riscontri che si avvicinano, ma non combaciano, alle entità del dizionario.
+riscontri che si avvicinano, anche non combaciando, alle entità del dizionario.
 
 Come prima versione si è scelto di adottare un dizionario esatto per la sua
 facilità d'implementazione e per i discreti risultati che si ottengono, già
@@ -312,8 +311,9 @@ tipo
 \textit{chunk}: il primo sottraendo la posizione di fine \textit{match} con la
 posizione d'inizio e l'ultimo assegnandoli la posizione d'inizio
 \item \textit{version} viene fissato a ``v2''
-\item \textit{origin} è scelta in base al corpo del testo
-\item \textit{status} è inizializzato con il valore ``new''.
+\item \textit{origin} è scelta in base al corpo della recensione 
+(\textit{free-text, pros, cons})
+\item \textit{status} è inizializzato con il valore ``new''
 \end{enumerate}
 
 Come richiesto nei requisiti, l'annotazione risultante possiede l'attributo
@@ -328,7 +328,7 @@ La progettazione dell'applicazione è illustrata in figura
 ``\textit{TextReviewForAnalytics}'', e genera la lista delle annotazioni,
 ``\textit{Annotation}'', trovate usando \textit{LingPipe}. Il metodo
 \textit{.findTagsInText()} è l'effettivo metodo che riconosce le annotazioni nel
-testo e genera la lista delle annotazioni. Essendo che una recensione può essere
+testo e genera la lista dei risultati. Essendo che una recensione può essere
 divisa in tre parti: testo libero, aspetti positivi e negativi;
 \textit{.findTagsInReview()} invoca \textit{.findTagsInText()} e nelle
 annotazioni risultate riporta la provenienza.
@@ -380,7 +380,7 @@ Per implementarle entrambi si è usato la libreria Java \textit{Morphia}, driver
 per gestire i documenti di \textit{MongoDB}. Oltre all'accesso effettivo al
 database, necessario per realizzare il \gls{DAO}, \textit{Morphia} estende il
 sistema delle \textit{annotazioni Java} per mappare classi in documenti in modo
-da essere poterli gestire.
+da poterli gestire. 
 
 Riguardo alle classi create, ``\textit{SentimentMemoryAnnotationDao}'' possiede
 il metodo per ottenere tutte le annotazioni del glossario, cosi da poterle
@@ -388,12 +388,12 @@ caricare nel dizionario di \textit{LingPipe}; mentre
 ``\textit{SentimentMemoryAnnotation}'' implementa \textit{getter e setter} per
 gli attributi presenti in un'annotazione.
 
-Per effettivamente eseguire il modulo ci pensa un \textit{runner}, il cui altro
-non è che una implementazione del \textit{Façade pattern} dove ogni metodo sono
-le operazioni eseguibili dall'applicazione Java, compreso il sistema di
-riconoscimento delle annotazioni. Sicuramente questo approccio potrebbe
-degenerare nella formazione di una \textit{fat interface} ma l'azienda non
-prevede l'aggiunta di molte funzionalità al programma. A mio avviso l'uso del
+L'esecuzione del modulo è a carico di un \textit{runner}, il quale 
+altro non è che una implementazione del \textit{Façade pattern} dove ogni 
+metodo sono le operazioni eseguibili dall'applicazione Java, compreso il 
+sistema di riconoscimento delle annotazioni. L'approccio potrebbe degenerare
+nella formazione di una \textit{fat interface} ma l'azienda non prevede 
+l'aggiunta di molte funzionalità al programma. A mio avviso l'uso del
 \textit{Command Patter} avrebbe garantito una maggiore estensibilità, senza
 introdurre difficoltà progettuali. Il comportamento del \textit{runner} viene
 gestito tramite file di configurazione in formato \gls{JSON} dove si vanno a
@@ -426,7 +426,7 @@ cardinalità del dizionario coincideva con il numero di annotazioni caricate.
 Il test iniziava con la compisizione di una recensione modello con le due
 caratteristiche
 \begin{itemize}
-\item Erano defini le tre parti di una recensione: \textit{pros, cons} e
+\item Erano definite le tre parti di una recensione: \textit{pros, cons} e
 \textit{free-text}
 \item Tutte le annotazioni del dizionario erano presenti nelle tre parti.
 \end{itemize}
@@ -440,12 +440,12 @@ recensione
 \item (1, ``pros'') - se l'annotazione provenisse dai \textit{pros} della
 recensione
 \item origin uguale a ``free-text'' se l'annotazione provenisse dal
-\textit{free-text} della recensione, l'attributo \textit{sentiment} non viene
+\textit{free-text} della recensione, l'attributo \textit{sentiment} non veniva
 controllato
 \end{enumerate}
 
 \paragraph{SentimentMemoryTagRecognizer.findTagInText()}
-A differenza del test sopra qui si ad assicurare che le annotazioni trovate
+A differenza del test sopra, qui si assicurava che le annotazioni trovate
 siano complete e ogni attributo abbia il giusto valore. Per eseguirlo si è
 usata direttamente un testo piano, salvato in una stringa, ed eseguito il metodo
 \textit{.findTagInTextTest()} per ottenere la lista di annotazioni presenti.
