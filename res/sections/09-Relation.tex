@@ -28,11 +28,11 @@ interesse che l'azienda nutre.
 \label{sec:ner}
 \subsection{Esportatore annotazioni dalle recensioni}
 \subsubsection{Requisiti}
-Il funzionamento del modulo NER è strettamente legato al glossario, la fonte 
-dove pesca le annotazioni. Inizialmente il glossario è vuoto quindi i primi 
-risultati riporteranno la completa assenza di supporto da parte del modulo, ma 
-man mano che vengano aggiunte nuove annotazioni il sistema d'individuazione 
-inizierà a svolgere il suo compito. Tuttavia la qualità del servizio nei primi 
+Il funzionamento del modulo NER è strettamente legato al glossario, la fonte
+dove pesca le annotazioni. Inizialmente il glossario è vuoto quindi i primi
+risultati riporteranno la completa assenza di supporto da parte del modulo, ma
+man mano che vengano aggiunte nuove annotazioni il sistema d'individuazione
+inizierà a svolgere il suo compito. Tuttavia la qualità del servizio nei primi
 periodi risentirà della scarsità d'annotazioni raccolte, impedendo di ottenere
 suggerimenti che siano un'aiuto concreto all'analista.
 
@@ -91,7 +91,7 @@ vengono implementati i \gls{DAO}. Vi sono due elementi elementi in
 \textit{mongoose}: lo \textbf{schema} ed il \textbf{modello}.
 
 Il primo è ciò che rende questo pacchetto molto versatile alla modellazione dei
-dati di un'applicazione. Attraverso la definizione di un oggetto in JavaScript, 
+dati di un'applicazione. Attraverso la definizione di un oggetto in JavaScript,
 è possibile definire di quali \textbf{attributi} il dato da modellare è composto
 e quali metodi il \gls{DAO} ha per interfacciarsi con esso. Nel caso in specie,
 ``\textit{AnnotationSchema}'' definisce come ``annotazione'' un oggetto conforme
@@ -125,7 +125,7 @@ delete)}\footnote{Per una maggior trattazione si veda
 \url{http://coursework.vschool.io/mongoose-crud/}}, implementati dal
 ``\textit{model}'' base di \textit{mongoose}, ed il metodo per effettuare la
 connessione al database da ``\textit{MySchema}''. Inoltre aggiunge un
-ulteriore metodo di classe: ``\textit{insertOrMerge}'', di cui se ne 
+ulteriore metodo di classe: ``\textit{insertOrMerge}'', di cui se ne
 approfondirà in seguito.
 
 Come si può notare il nuovo schema dell'annotazione è molto simile a quello
@@ -147,8 +147,8 @@ Con la seconda modifica invece si gira la relazione \textit{uno a molti} tra
 la recensione e l'annotazione, ottenendo che nell'annotazione si mantengono i
 riferimenti alle recensioni in cui appare. La gestione dei riferimenti è
 compito del \textit{insertOrMerge} citato sopra. La sua funzione è di o inserire
-la nuova annotazione se non è già presente o di agganciare i suoi riferimenti 
-alle recensioni non ancora presenti nell'attributo ``\textit{reviews}'' di 
+la nuova annotazione se non è già presente o di agganciare i suoi riferimenti
+alle recensioni non ancora presenti nell'attributo ``\textit{reviews}'' di
 quella presente, mantenendo cosi la relazione desiderata.
 
 Infine ``\textit{status}'' viene usato per identificare in quale stato si trova
@@ -311,7 +311,7 @@ tipo
 \textit{chunk}: il primo sottraendo la posizione di fine \textit{match} con la
 posizione d'inizio e l'ultimo assegnandoli la posizione d'inizio
 \item \textit{version} viene fissato a ``v2''
-\item \textit{origin} è scelta in base al corpo della recensione 
+\item \textit{origin} è scelta in base al corpo della recensione
 (\textit{free-text, pros, cons})
 \item \textit{status} è inizializzato con il valore ``new''
 \end{enumerate}
@@ -380,7 +380,7 @@ Per implementarle entrambi si è usato la libreria Java \textit{Morphia}, driver
 per gestire i documenti di \textit{MongoDB}. Oltre all'accesso effettivo al
 database, necessario per realizzare il \gls{DAO}, \textit{Morphia} estende il
 sistema delle \textit{annotazioni Java} per mappare classi in documenti in modo
-da poterli gestire. 
+da poterli gestire.
 
 Riguardo alle classi create, ``\textit{SentimentMemoryAnnotationDao}'' possiede
 il metodo per ottenere tutte le annotazioni del glossario, cosi da poterle
@@ -388,11 +388,11 @@ caricare nel dizionario di \textit{LingPipe}; mentre
 ``\textit{SentimentMemoryAnnotation}'' implementa \textit{getter e setter} per
 gli attributi presenti in un'annotazione.
 
-L'esecuzione del modulo è a carico di un \textit{runner}, il quale 
-altro non è che una implementazione del \textit{Façade pattern} dove ogni 
-metodo sono le operazioni eseguibili dall'applicazione Java, compreso il 
+L'esecuzione del modulo è a carico di un \textit{runner}, il quale
+altro non è che una implementazione del \textit{Façade pattern} dove ogni
+metodo sono le operazioni eseguibili dall'applicazione Java, compreso il
 sistema di riconoscimento delle annotazioni. L'approccio potrebbe degenerare
-nella formazione di una \textit{fat interface} ma l'azienda non prevede 
+nella formazione di una \textit{fat interface} ma l'azienda non prevede
 l'aggiunta di molte funzionalità al programma. A mio avviso l'uso del
 \textit{Command Patter} avrebbe garantito una maggiore estensibilità, senza
 introdurre difficoltà progettuali. Il comportamento del \textit{runner} viene
@@ -416,15 +416,15 @@ I test sono stati eseguiti sui metodi di
 \paragraph{SentimentMemoryTagRecognizerFactory.create()}
 Il test consisteva nella creazione di un'istanza di
 ``\textit{SentimentMemoryTagRecognizer}'' con associato un dizionario di
-annotazioni formato da due elementi caricati precedentemente da una collezione
+annotazioni formato da due elementi, caricati precedentemente da una collezione
 \textit{MongoDB} in locale. Con \textit{.getDictionary()} di
 ``\textit{SentimentMemoryTagRecognizer}'' si andava a recuperare il dizionario
 per estrarre il numero degli elementi contenuti. Il test passava se la
 cardinalità del dizionario coincideva con il numero di annotazioni caricate.
 
 \paragraph{SentimentMemoryTagRecognizer.findTagsInReview()}
-Il test iniziava con la compisizione di una recensione modello con le due
-caratteristiche
+Il test iniziava con la compisizione di una recensione modello le
+caratteristiche:
 \begin{itemize}
 \item Erano definite le tre parti di una recensione: \textit{pros, cons} e
 \textit{free-text}
@@ -446,9 +446,10 @@ controllato
 
 \paragraph{SentimentMemoryTagRecognizer.findTagInText()}
 A differenza del test sopra, qui si assicurava che le annotazioni trovate
-siano complete e ogni attributo abbia il giusto valore. Per eseguirlo si è
-usata direttamente un testo piano, salvato in una stringa, ed eseguito il metodo
-\textit{.findTagInTextTest()} per ottenere la lista di annotazioni presenti.
+fossero complete e ogni attributo avesse il giusto valore. Per eseguirlo si è
+usato direttamente un testo piano, salvato in una stringa, ed eseguendo il
+metodo \textit{.findTagInTextTest()} per ottenere la lista delle annotazioni
+presenti.
 
 L'analisi degli attributi veniva eseguita solo su quella in testa alla lista.
 
@@ -477,7 +478,7 @@ Diagramma di sequenza per il metodo di esecuzione del modulo NER
 \end{center}
 \end{figure}
 
-Una volta sviluppato le altre operazioni riguardavano solo il file di
+Una volta sviluppato, le altre operazioni riguardavano solo il file di
 configurazione del modulo \gls{NER}. Nel campo \textit{database} è stato
 riportato l'indirizzo del database aziendale dove sono tenute le collezioni
 delle recensioni e del glossario; invece in \textit{run} si è trascritto il nome
@@ -492,8 +493,7 @@ Non sono stati sviluppati test in quanto le parti che vanno a comporlo sono
 state già collaudate e non si è visto la necessità di crearli visto la
 dimensione ridotta della funzione. Per quanto riguarda il \textit{tool} usato
 dagli analisti, neanche li vi è stato nessuna creazione di test in quanto il
-modulo per l'editor era già stata creato e collaudato precedentemente
-dall'azienda.
+modulo per l'editor era già collaudato dall'azienda.
 %\subsubsection{Script di misurazione qualità}
 %
 
@@ -506,14 +506,15 @@ necessario creare un collegamento tra l'applicazione web ed i dati archiviati
 nel database.
 
 Come spiegato le applicazioni seguono il modello del
-\gls{single-page-application} ed sono progettate attraverso l'architettura
+\gls{single-page-application} e sono progettate attraverso l'architettura
 \textit{REST}, eseguendo il \gls{front-end} nel \textit{client} ed il
 \gls{back-end} nei \textit{web server} aziendali comunicando via
 \textit{RESTful API} per gestire le risorse. Fondamentalmente, le risorse sono i
-dati archiviati nelle \textit{collection MongoDB} è del compito \gls{back-end}
-fornire tutte le interfaccia per leggerli, scriverli, modificarli e cancellarli.
+dati archiviati nelle \textit{collection MongoDB} ed è compito del
+\gls{back-end} fornire tutte le interfaccia per leggerli, scriverli, modificarli
+e cancellarli.
 
-Però, se venisse applicato il medesimo principio per ogni applicazione
+Se venisse applicato il medesimo principio per ogni applicazione
 verrebbero a formarsi una serie di \gls{back-end} la cui unica differenza è
 l'insieme di entità che vanno a gestire, lasciando invariate le operazioni
 \textit{CRUD} sui dati, l'interfacciamento con il database e quello con il
@@ -529,7 +530,7 @@ il \textit{proxy}, del \textit{Proxy pettern}, dei \gls{DAO} sfruttando le
 interfacce del \gls{BaaS} studiate per essere completamente generiche
 sulle entità da modellare. La scelta di implementare servizi \textit{AngularJS}
 risulta vantaggiosa data la possibilità di usare la \gls{dependency-injection},
-offerta dal \textit{framework}, per connetterli agli altri oggetti.
+offerta dal \textit{framework}, per connetterli ad altri oggetti.
 
 Nel caso dell'applicazione per la moderazione, bisognava costruire un servizio
 \textit{AngularJS} che fornisse tutti i metodi per modellare le annotazioni del
@@ -547,17 +548,17 @@ descritto.
 
 La classe base fornisce le operazioni \textit{CRUD} sui dati ed implementa il
 sistema di comunicazione col \gls{BaaS} tramite il servizio \textit{\$http} di
-\textit{AngularJS}. Il servizio comanda il \textit{browser} ad inviare richieste
+\textit{AngularJS}. Il servizio comanda il \textit{browser} di inviare richieste
 HTTP con i metodi \textit{GET, POST, PUT} e \textit{DELETE}. Le richieste
-vengono svolte in modo asincrono e la risposta viene rappresentata con
+vengono svolte in modo asincrono e la risposta viene rappresentata con una
 \textit{Promise}, semplificando la gestione e migliorando la pulizia del codice.
 
 La classe derivata, invece, aggiunge metodi di aggiornamento dei valori di
 un'annotazione e composizione di query per ottenere solo un certo sottoinsieme
 del glossario (si rivelerà sostanzialmente utile nella creazione della GUI),
-in modo da sia applicare filtri categoria, funzione, sentimento e cosi via sia
-per realizzare semplici interrogazione nella collezione, come per esempio
-ottenere tutti i tipi di categoria registrate nelle annotazioni.
+in modo da sia applicare filtri per categoria, funzione, sentimento e cosi via
+sia per realizzare semplici interrogazioni nella collezione, come per esempio
+ottenere tutti i tipi di ``\textit{category}'' registrate nelle annotazioni.
 
 \begin{figure}[H]
 \begin{center}
@@ -571,7 +572,7 @@ Diagramma delle classi sul servizio \textit{AngularJS} sulle annotazioni
 
 \subsubsection{Test}
 I test programmati con il tutor aziendale sono stati rivolti esclusivamente
-sulle operazioni necessarie allo sviluppo dell'editor che consistevano:
+sulle operazioni necessarie allo sviluppo dell'editor, ovvero:
 aggiornamento dell'attributo \textit{status} di una annotazione e
 ottenimento di tutti i valori assunti da \textit{category} in tutte le
 annotazioni. I motivi sono spiegati nella prossima sezione.
@@ -593,12 +594,12 @@ L'interfaccia doveva visualizzare ogni annotazione con i relativi campi
 informativi e, molto importante, doveva essere possibili mostrare le recensioni
 in cui appariva. Quest'ultimo fattore era essenziale al moderatore per eseguire
 operazioni di verifica sull'annotazione, in quanto, garantisce il contesto da
-cui l'annotazione proviene. In caso di un'annotazione poco chiara, solo
-attraverso il testo originale si sarebbe potuto valutarla e attuare una scelta o
-di rifiuto o d'integrazione nel glossario.
+cui proviene. In caso di un'annotazione poco chiara, solo attraverso il testo
+originale si sarebbe potuto valutarla e attuare una scelta o di rifiuto o d'
+integrazione nel glossario.
 
 Lo stato dell'annotazione doveva essere ben visibile e selezionabile tra i tre
-stati possibili.
+possibili.
 
 Il numero delle annotazione sarebbe potuto diventare molto grande quindi era
 necessario raggruppare le annotazioni in gruppi e mostrarne solo uno per volta.
@@ -606,7 +607,7 @@ Se il \textbf{Senior Analyst}, attraverso un pulsante apposito, ne faceva
 richiesta il successivo gruppo d'annotazioni sarebbe stato aggiunto a quelli già
 presenti. Ogni gruppo doveva essere formato da dieci annotazioni, un numero per
 l'azienda equilibrato che non imponeva costantemente di richiedere un successivo
-gruppo e neanche affollasse lo schermo di annotazioni irrilevanti.
+gruppo e neanche affollare lo schermo di annotazioni irrilevanti.
 
 Infine, bisognava creare un filtro di ricerca in base alla categoria dell'
 annotazione ed al suo stato. Oltre, per esempio, mostrare solo le nuove
@@ -652,9 +653,9 @@ testo senza alcuna interazione, al contrario delle celle per il campo
 \textit{reviews} e \textit{status}.
 
 Nelle celle \textit{reviews} appare un numero indicante in quante recensioni
-l'annotazione era stata individuata. Il numero è legato ad il \textit{link} per
+l'annotazione è individuata. Il numero è legato al \textit{link} per
 la pagina di visualizzazione delle recensioni con sottolineato il testo dell'
-annotazione interessata. In questo modo quando l'\textbf{analista} desidera
+annotazione interessata. In questo modo, quando l'\textbf{analista} desidera
 controllare l'origine dell'annotazione gli basta premere sul link per ottenere
 tutte le recensioni in cui appare. Il formato di questa pagina segue la stessa
 dell'editor testuale agevolando l'utente nella navigazione. L'unica differenza
@@ -662,7 +663,7 @@ sta nell'impossibilità di modificare o annotare le recensioni, limitando
 l'interazione alla sola lettura. L'approccio scelto soddisfa il requisito ma
 risulta inefficace per quanto concerne l'usabilità del sistema, imponendo
 l'utente di consumare due ``\textit{click}'' del mouse per eseguire un'
-operazione di rilievo, uno per saltare alla pagina delle recensioni ed uno per
+operazione di rilievo: uno per saltare alla pagina delle recensioni ed uno per
 tornare indietro. Tuttavia, dopo una discussione con il proponente, la mancata
 visione di un'\textit{opportunity} generava un esiguo livello d'interesse ad un
 cambio d'impostazione del layout, giungendo alla scelta di mantenere quello
@@ -672,12 +673,12 @@ Le celle \textit{status} invece contengono tre pulsanti con il quale si va sia a
 visualizzare lo stato dell'annotazione e sia permettere al
 \textbf{Senior Analyst} di cambiarglielo. I tre pulsanti vengono colorati di due
 colori distinti: blu lo stato attivo e grigio gli altri; permettendo con
-semplicità comprendere in quale stato l'annotazione si trovi. Essendo pulsanti,
-basta premere su quello che rappresenta lo stato voluto per inviare la richiesta
-di aggiornamento (le operazioni sono svolte nel \gls{front-end} ma i dati sono
-nel \gls{back-end}). Se l'operazione avviene senza errori allora il pulsante
-appena premuto si colorerà di blu e l'altro diverrà grigio, altrimenti apparirà
-sullo schermo un messaggio d'errore.
+semplicità di comprendere in quale stato l'annotazione si trovi. Essendo
+pulsanti, basta premere su quello che rappresenta lo stato voluto per inviare la
+richiesta di aggiornamento (le operazioni sono svolte nel \gls{front-end} ma i
+dati sono nel \gls{back-end}). Se l'operazione avviene senza errori allora il
+pulsante appena premuto si colorerà di blu e l'altro diverrà grigio, altrimenti
+apparirà sullo schermo un messaggio d'errore.
 
 Il cambio di stato dell'annotazione è una delle possibili azioni vincolate alla
 comunicazione con il \textit{back-end} via \textit{Internet} e la lettura e
@@ -727,7 +728,7 @@ ad un metodo nell'oggetto utente e ogni metodo è realizzato con le sapienti
 \gls{API} di \textit{Protractor}, risultando una continua generazione di
 \textit{Promise} ad ogni invocazione. Grazie alla loro proprietà di
 ``incatenamento'' si è in grado di pilotare l'utente virtuale realizzando una
-serie di compiti da fargli svolgere, portando al completamento del compito.
+serie di compiti da fargli svolgere, portando al completamento del test.
 
 La progettazione dell'utente non era banale. Il rischio di produrre azioni
 troppo complesse, non sfruttando la concatenazione delle azioni, e troppo
@@ -775,7 +776,7 @@ describe('USE CASE: get other annotations', function () {
 \end{center}
 
 Come si può vedere i nomi dei metodi equivalgono alla descrizione dell'azione
-da compiere. Si è pensato di dividere di creare una gerarchia d'utenti in modo
+da compiere. Si è pensato di creare una gerarchia d'utenti in modo
 da inserire azioni generiche nella classe base (vai in una pagina, login, ecc...
 ) e le azioni più specifiche dell'applicazione nella classe derivata (conta
 annotazioni, clicca sul numero di recensioni, ecc...). Ora i test per i casi
@@ -826,8 +827,8 @@ risolata e dopo il risultato verrebbe passato a quella successiva.
 
 \section{Refactoring del BaaS}
 \subsection{Stato iniziale}
-Una mansione da svolgere era pulire dallo stesso \gls{BaaS} utilizzato dall'
-applicazione web alcune smagliature lasciate durante le fasi di sviluppo.
+Una mansione da svolgere era pulire dallo stesso \gls{BaaS}, utilizzato dall'
+applicazione web, alcune smagliature lasciate durante le fasi di sviluppo.
 
 Il \gls{BaaS} si presenta come l'unione di quattro pacchetti \textit{npm}:
 \begin{itemize}
@@ -859,7 +860,7 @@ Ora inseriamo la variabile versione al sistema delle dipendenze. Nel
 \textit{package.json} è possibile definire la versione delle dipendenze
 attraverso vari operatori che conferisco elasticità o rigidità all'insieme di
 scelte delle versioni. Facendo un esempio, nella dichiarazione della dipendenza
-ad un pacchetto ``A'' si può scegliere fra i seguenti operati:
+ad un pacchetto ``A'' si può scegliere fra i seguenti operatori:
 \begin{itemize}
   \item > o < la dipendenza deve avere una versione almeno maggiore o più bassa
   del valore specificato
@@ -871,7 +872,7 @@ dipendenze che verranno installate, garantendogli la stabilità del codice che �
 fondamentale quando si mette in pubblica un servizio come il \gls{BaaS}.
 Sorprendentemente però la situazione non è cosi. La scela della versione delle
 dipendeze è limitata a solo il primo livello dell'albero, lasciando per i
-livelli successivi quelle specificate dall'autore. Perciò non è possibile
+livelli successivi quelle specificate nelle dipendenze. Perciò non è possibile
 garantire che l'istanza dell'albero delle dipendenze rimanga costante.
 Poniamo nell'esempio che ``A'' abbia come dipendenza ``B''. Se l'autore di ``A''
 avesse specificato che la versione ``B'' potesse essere una qualunque superiore
@@ -910,9 +911,9 @@ nei repository dei moduli salendo i livelli di dipendenza fino ad arrivare ad
 perdita cospicua di tempo.
 
 A causa di tempistiche strette, lo sviluppo e gli aggiornamenti delle dipendenze
-vennero effettuati nelle versioni all'interno di \textit{node\_modules} in
+vennero effettuate nelle versioni all'interno di \textit{node\_modules} in
 \textit{admin.api.wonderflow.co}, evitando di eseguire i passaggi d'
-aggiornamento ma lasciando versioni obsolete del codice nei \textit{repository}.
+aggiornamento e lasciando versioni obsolete del codice nei \textit{repository}.
 
 Il principale compito da svolgere era riportare il codice sorgente nei propri
 \textit{repository}, rimpiazzando il codice con quello aggiornato in modo da
@@ -925,7 +926,7 @@ riscontrati e le soluzioni adottate.
 \subsubsection{Requisiti}
 Il pacchetto \textit{restful-mongo-utils} ha il compito di esportare gestori per
 le richiesta HTTP \textit{get, post, put} e \textit{delete}. I gestori vengono
-realizzati tramite funzioni in cui andavano a implementare la logica per l'
+realizzati tramite funzioni in cui vanno ad implementare la logica per l'
 accesso ai dati nei \textit{database MongoDB}, fornendo cosi le \gls{API}
 generiche utilizzate per sopperire il bisogno di costruire un \gls{back-end}
 ``ad hoc'' per le applicazioni web.
@@ -933,7 +934,7 @@ generiche utilizzate per sopperire il bisogno di costruire un \gls{back-end}
 Nella situazione precedente al \gls{refactoring} i gestori esposti coprivano
 solo le richieste \textit{put e delete}, mente per \textit{get} e \textit{post}
 erano stati sviluppati direttamente nel pacchetto \textit{restful-mongo2} il
-quale ambisce a tutt'altro scopo. In più l'organizzazione interna di
+quale ambisce a tutt'altro scopo. In più, l'organizzazione interna di
 \textit{restful-mongo-utils} era spartana, inadatta alle possibili evoluzioni
 del software. In figura \ref{fig:restful_mongo} è rappresentata la situazione
 originale.
@@ -981,8 +982,8 @@ approccio. Ovviamente diventava necessario invocare sempre il \textit{.bind()}
 prima di utilizzare i funtori ed è per questo che ``\textit{Handler}'' è stata
 inserito. La classe implementa il \textit{Façade pattern}, dando un unico punto
 d'accesso al pacchetto, e fornisce i funtori esportati correttamente invocando
-il metodo \textit{.bind()}. Un'obiettivo raggiunto dal \textit{Façade} era l'
-esposizione di un'interfaccia compatibile a quella della versione prima.
+il metodo \textit{.bind()}. Un altro obiettivo raggiunto dal \textit{Façade} era
+l'esposizione di un'interfaccia compatibile a quella della versione prima.
 In tal modo non sarebbe stata necessario alcuna operazione d'adattamento in
 \textit{restful-mongo2}, velocizzando il completamento del \textit{refactoring}.
 
@@ -999,7 +1000,7 @@ I tre pacchetti mancanti da ristrutturare condividono il medesimo obiettivo:
 provvedere \gls{API} all'applicazione \textit{Express}.
 
 Infatti ognuno di loro prendevano un oggetto \textit{Express} dove definire per
-ogni metodo HTTP un \gls{API} legata ad un certo ambito, nello specifico:
+ogni metodo HTTP un \gls{API} legata ad un certo ambito. Nello specifico:
 \begin{itemize}
 \item \textit{restful-mongo2} - operazioni \textit{CRUD} al database
 \item \textit{wonderflow-api-app2} - gestione utenti e privilegi d'accesso
@@ -1022,18 +1023,18 @@ tutta una batteria di \gls{E2ET} dove vanno a simulare ogni azione di rilievo
 delle varie applicazioni web, la quale richiedono il \gls{BaaS} per funzionare.
 L'ambiente di simulazione d'interazione tra \gls{front-end} e \gls{back-end}
 veniva costruito sfruttando l'eccezionale sistema di composizione offerto da
-\textit{Docker}. Praticamente si creano tre \textit{immagini Docker}, una per
-ognuna delle parti coinvolte, e si va a comporre l'infrastruttura del sistema
-da modellare. Le immagini rappresentano il componente autonomo del sistema, con
-tutte le risorse necessarie per eseguire. Nel caso del \gls{BaaS} ristrutturato,
-l'immagine conterrà il pacchetto \textit{admin.api.wonderflow.co}, tutte le
-sue dipendenze nel \textit{node\_modules} e un file di configurazione con
-descritta la procedura d'avvio dell'applicazione \textit{Express} una volta
-che l'immagine sarà montata. Le immagini eseguite da \textit{Docker} vengono
-chiamate \textit{container}.
+\textit{Docker}. Praticamente si creavano tre \textit{immagini Docker}, una per
+ognuna delle parti coinvolte, e si andava a comporre l'infrastruttura del
+sistema da modellare. Le immagini rappresentano il componente autonomo del
+sistema, con tutte le risorse necessarie per eseguire. Nel caso del \gls{BaaS}
+ristrutturato, l'immagine conterrà il pacchetto \textit{admin.api.wonderflow.co}
+, tutte le sue dipendenze nel \textit{node\_modules} e un file di configurazione
+con descritta la procedura d'avvio dell'applicazione \textit{Express} una volta
+che sarà montata. Le immagini eseguite da \textit{Docker} vengono chiamate
+\textit{container}.
 
 Il sistema di test (immagine \ref{fig:stack_docker}) sarà in esecuzione al
-fianco del sistema operativo e sarà perciò interagibile in ogni istanze.
+fianco del sistema operativo e sarà perciò interagibile in ogni istante.
 
 Quando il \gls{BaaS} avrà superato tutti gli \gls{E2ET} sarà possibile
 pubblicare la nuova versione dell'immagine \textit{Docker} ed installarla nei
@@ -1056,18 +1057,18 @@ riutilizzo. Tuttavia l'inizio di un loro sviluppo diventava una procedura
 macchinosa e ripetitiva: tra inizializzazione del pacchetto \textit{npm},
 quello \textit{Bower.js}\footnote{molto simile ad \textit{npm} ma orientato per
 il web} e le configurazione di \textit{karma}, lo sviluppatore doveva spendere
- vari minuti per ottenere un ambiente di lavoro operativo.
+vari minuti per ottenere un ambiente di lavoro operativo.
 
 La Wonderflow ha pensato che un miglioramento nello sviluppo sarebbe stato di
 rimuovere il tempo di \textit{overhead} per costruire componenti
 \textit{Angular.js} attraverso un \textit{Yeoman Generator}.
 
 \textit{Yeoman} è programma, sempre nell'ambiente \textit{Node.js}, il quale
-gestisce generatori script previsti per la creare strutture come file o
-directory. I generatori sono pacchetti \textit{npm} che seguono la struttura
-imposta da \textit{Yeoman} che, brevemente, richiede di inserire il progetto
-in una cartella nominata ``generators'' e, da li in poi, ogni sottocartella
-definisce le parti del progetto realizzabili.
+gestisce particolari script, chiamati generatori, previsti per la creazione di
+strutture come file o directory. I generatori sono pacchetti \textit{npm} che
+seguono la struttura imposta da \textit{Yeoman} che, brevemente, richiede di
+inserire il progetto in una cartella nominata ``generators'' e, da li in poi,
+ogni sottocartella definisce le parti del progetto realizzabili.
 
 Il generatore doveva poter essere in grado di creare:
 \begin{itemize}
@@ -1077,9 +1078,9 @@ Il generatore doveva poter essere in grado di creare:
 \textit{karma}
 \end{itemize}
 
-Inoltre alcuni aspetti richiedevano la configurazione manuale perciò era
+Inoltre, alcuni aspetti richiedevano la configurazione manuale perciò era
 importante utilizzare i sistemi d'interazione offerti da \textit{Yeoman} per
-permettere all'utente di scegliere alcune opzioni
+permettere all'utente di scegliere alcune opzioni.
 
 \subsection{Sviluppo}
 Essendo tre le parti generabili da \textit{Yeoman}, all'interno della cartella
